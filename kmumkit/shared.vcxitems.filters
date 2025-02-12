@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="km">
+      <UniqueIdentifier>{07b997e8-9d14-4591-9f11-ceb959d1ee9f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ex">
+      <UniqueIdentifier>{cadc3d7e-460e-49b8-ad52-627dc1ba2c55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="um">
+      <UniqueIdentifier>{edc9ea15-34df-4014-852d-6728b8713923}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)ntstatus.h">
+      <Filter>km</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)ntos.h">
+      <Filter>km</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sig.h">
+      <Filter>ex</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)drv.h">
+      <Filter>um</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)dbg.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)ntdll.h">
+      <Filter>um</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)amd64.h">
+      <Filter>km</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)win.h">
+      <Filter>um</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)ut.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)sig.cpp">
+      <Filter>ex</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)drv.cpp">
+      <Filter>um</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)ntos.cpp">
+      <Filter>km</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)amd64.cpp">
+      <Filter>km</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)win.cpp">
+      <Filter>um</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

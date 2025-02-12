@@ -1,0 +1,71 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.35806.103
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kmumkit", "kmumkit\kmumkit.vcxproj", "{11334C07-CB22-CC6B-1AD0-D299E8BA9380}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cleaner", "cleaner\cleaner.vcxproj", "{6BA24049-A0E0-5C93-7D7B-C52A129DA95B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "loader", "loader\loader.vcxproj", "{C4FC7235-442D-4032-ACB0-8B257B5B958D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "drv", "drv", "{36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib", "lib", "{5E88681D-6F83-4898-9465-4E83EC6D808C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "conf", "conf", "{A215FFBF-C4E3-4DD2-8DE4-F18A7AF7ADBD}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		debug_km|x64 = debug_km|x64
+		debug_um|x64 = debug_um|x64
+		release_km|x64 = release_km|x64
+		release_um|x64 = release_um|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{11334C07-CB22-CC6B-1AD0-D299E8BA9380}.debug_km|x64.ActiveCfg = debug_km|x64
+		{11334C07-CB22-CC6B-1AD0-D299E8BA9380}.debug_km|x64.Build.0 = debug_km|x64
+		{11334C07-CB22-CC6B-1AD0-D299E8BA9380}.debug_km|x64.Deploy.0 = debug_km|x64
+		{11334C07-CB22-CC6B-1AD0-D299E8BA9380}.debug_um|x64.ActiveCfg = debug_um|x64
+		{11334C07-CB22-CC6B-1AD0-D299E8BA9380}.debug_um|x64.Build.0 = debug_um|x64
+		{11334C07-CB22-CC6B-1AD0-D299E8BA9380}.debug_um|x64.Deploy.0 = debug_um|x64
+		{11334C07-CB22-CC6B-1AD0-D299E8BA9380}.release_km|x64.ActiveCfg = release_km|x64
+		{11334C07-CB22-CC6B-1AD0-D299E8BA9380}.release_km|x64.Build.0 = release_km|x64
+		{11334C07-CB22-CC6B-1AD0-D299E8BA9380}.release_km|x64.Deploy.0 = release_km|x64
+		{11334C07-CB22-CC6B-1AD0-D299E8BA9380}.release_um|x64.ActiveCfg = release_um|x64
+		{11334C07-CB22-CC6B-1AD0-D299E8BA9380}.release_um|x64.Build.0 = release_um|x64
+		{11334C07-CB22-CC6B-1AD0-D299E8BA9380}.release_um|x64.Deploy.0 = release_um|x64
+		{6BA24049-A0E0-5C93-7D7B-C52A129DA95B}.debug_km|x64.ActiveCfg = Debug|x64
+		{6BA24049-A0E0-5C93-7D7B-C52A129DA95B}.debug_km|x64.Build.0 = Debug|x64
+		{6BA24049-A0E0-5C93-7D7B-C52A129DA95B}.debug_km|x64.Deploy.0 = Debug|x64
+		{6BA24049-A0E0-5C93-7D7B-C52A129DA95B}.debug_um|x64.ActiveCfg = Debug|x64
+		{6BA24049-A0E0-5C93-7D7B-C52A129DA95B}.debug_um|x64.Build.0 = Debug|x64
+		{6BA24049-A0E0-5C93-7D7B-C52A129DA95B}.debug_um|x64.Deploy.0 = Debug|x64
+		{6BA24049-A0E0-5C93-7D7B-C52A129DA95B}.release_km|x64.ActiveCfg = Release|x64
+		{6BA24049-A0E0-5C93-7D7B-C52A129DA95B}.release_km|x64.Build.0 = Release|x64
+		{6BA24049-A0E0-5C93-7D7B-C52A129DA95B}.release_km|x64.Deploy.0 = Release|x64
+		{6BA24049-A0E0-5C93-7D7B-C52A129DA95B}.release_um|x64.ActiveCfg = Release|x64
+		{6BA24049-A0E0-5C93-7D7B-C52A129DA95B}.release_um|x64.Build.0 = Release|x64
+		{6BA24049-A0E0-5C93-7D7B-C52A129DA95B}.release_um|x64.Deploy.0 = Release|x64
+		{C4FC7235-442D-4032-ACB0-8B257B5B958D}.debug_km|x64.ActiveCfg = Debug|x64
+		{C4FC7235-442D-4032-ACB0-8B257B5B958D}.debug_km|x64.Build.0 = Debug|x64
+		{C4FC7235-442D-4032-ACB0-8B257B5B958D}.debug_um|x64.ActiveCfg = Debug|x64
+		{C4FC7235-442D-4032-ACB0-8B257B5B958D}.debug_um|x64.Build.0 = Debug|x64
+		{C4FC7235-442D-4032-ACB0-8B257B5B958D}.release_km|x64.ActiveCfg = Release|x64
+		{C4FC7235-442D-4032-ACB0-8B257B5B958D}.release_km|x64.Build.0 = Release|x64
+		{C4FC7235-442D-4032-ACB0-8B257B5B958D}.release_um|x64.ActiveCfg = Release|x64
+		{C4FC7235-442D-4032-ACB0-8B257B5B958D}.release_um|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{11334C07-CB22-CC6B-1AD0-D299E8BA9380} = {5E88681D-6F83-4898-9465-4E83EC6D808C}
+		{6BA24049-A0E0-5C93-7D7B-C52A129DA95B} = {36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EFF62B4B-94A5-4DF7-A377-F85458F2E9E5}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="um">
+      <UniqueIdentifier>{69c95b1f-a2f6-4316-a68a-cba241b70209}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ex">
+      <UniqueIdentifier>{3c12031c-f953-421e-9d3e-dff3a27ba0ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="km">
+      <UniqueIdentifier>{b2f98830-aa2b-4e11-bee4-15ab9d415321}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="drv.cpp">
+      <Filter>um</Filter>
+    </ClCompile>
+    <ClCompile Include="sig.cpp">
+      <Filter>ex</Filter>
+    </ClCompile>
+    <ClCompile Include="amd64.cpp">
+      <Filter>km</Filter>
+    </ClCompile>
+    <ClCompile Include="ntos.cpp">
+      <Filter>km</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="drv.h">
+      <Filter>um</Filter>
+    </ClInclude>
+    <ClInclude Include="ntdll.h">
+      <Filter>um</Filter>
+    </ClInclude>
+    <ClInclude Include="sig.h">
+      <Filter>ex</Filter>
+    </ClInclude>
+    <ClInclude Include="ut.h">
+      <Filter>ex</Filter>
+    </ClInclude>
+    <ClInclude Include="dbg.h">
+      <Filter>ex</Filter>
+    </ClInclude>
+    <ClInclude Include="amd64.h">
+      <Filter>km</Filter>
+    </ClInclude>
+    <ClInclude Include="ntos.h">
+      <Filter>km</Filter>
+    </ClInclude>
+    <ClInclude Include="ntstatus.h">
+      <Filter>km</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
