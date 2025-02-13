@@ -1,7 +1,7 @@
-#pragma once
+﻿#pragma once
 #pragma region all
-#include "dbg.h"
 #include "amd64.h"
+#include "dbg.h"
 #pragma endregion
 
 #ifdef __km__
@@ -9,11 +9,11 @@
 #endif // __km__
 
 #ifdef __um__
-#include "ntdll.h"
 #include <windows.h>
+#include "ntdll.h"
 
-void* ntGetCiOptions();
-uintptr_t ntGetRvaCiOptions();
-physaddr ntGetPml4Base(funcReadPa fnRead);
-void* ntGetImageBase(_In_ const wchar_t* szModuleName);
+void*	  ntGetCiOptions ();
+uintptr_t ntGetRvaCiOptions ();
+physaddr  ntGetPml4Base (funcReadPa fnRead);
+void*	  ntGetImageBase (IN const wchar_t* szModuleName);
 #endif // __um__

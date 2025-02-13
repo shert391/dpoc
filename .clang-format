@@ -1,0 +1,133 @@
+﻿# https://clang.llvm.org/docs/ClangFormatStyleOptions.html#alignconsecutivedeclarations
+Standard: Latest
+
+AlignConsecutiveTableGenBreakingDAGArgColons:
+  Enabled: true
+  AcrossEmptyLines: true
+  AcrossComments: true
+  AlignCompound: true
+  AlignFunctionDeclarations: true
+  AlignFunctionPointers: true
+  PadOperators: true
+AlignConsecutiveTableGenCondOperatorColons:
+  Enabled: true
+  AcrossEmptyLines: true
+  AcrossComments: true
+  AlignCompound: true
+  AlignFunctionPointers: true
+  PadOperators: true
+AlignConsecutiveTableGenDefinitionColons:
+  Enabled: true
+  AcrossEmptyLines: true
+  AcrossComments: true
+  AlignCompound: true
+  AlignFunctionPointers: true
+  PadOperators: true
+AllowShortCaseExpressionOnASingleLine: true
+AlignConsecutiveShortCaseStatements:
+  Enabled: true
+  AcrossEmptyLines: true
+  AcrossComments: true
+  AlignCaseArrows: true
+  AlignCaseColons: false
+AlignConsecutiveDeclarations: true
+AlignConsecutiveAssignments: true
+AlignConsecutiveBitFields: true
+AlignArrayOfStructures: Right
+AlignConsecutiveMacros: true
+AlignEscapedNewlines: Right
+AlignTrailingComments:
+  Kind: Always
+  OverEmptyLines: 2
+AlignOperands: Align
+
+AllowShortIfStatementsOnASingleLine: AllIfsAndElse
+AllowShortCompoundRequirementOnASingleLine: true
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortNamespacesOnASingleLine: true
+AllowShortFunctionsOnASingleLine: All
+AllowShortBlocksOnASingleLine: Always
+AllowShortLambdasOnASingleLine: All
+AllowShortLoopsOnASingleLine: true
+AllowShortEnumsOnASingleLine: true
+
+BinPackParameters: OnePerLine
+BinPackLongBracedList: true
+
+BreakBeforeConceptDeclarations: Always
+BreakTemplateDeclarations: Yes
+BreakAfterAttributes: Always
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterCaseLabel: false
+  AfterClass: false
+  AfterControlStatement: Never
+  AfterEnum: false
+  AfterFunction: false
+  AfterNamespace: false
+  AfterObjCDeclaration: false
+  AfterStruct: false
+  AfterUnion: false
+  AfterExternBlock: false
+  BeforeCatch: true
+  BeforeElse: true
+  BeforeLambdaBody: false
+  BeforeWhile: false
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: false
+
+SpaceBeforeParensOptions:
+  AfterControlStatements: true
+  AfterForeachMacros: true
+  AfterFunctionDeclarationName: true
+  AfterFunctionDefinitionName: true
+  AfterIfMacros: true
+  AfterOverloadedOperator: true
+  AfterPlacementOperator: true
+  AfterRequiresInClause: true
+  AfterRequiresInExpression: true
+  BeforeNonEmptyParentheses: false
+SpaceBeforeParens: Custom
+
+EmptyLineBeforeAccessModifier: Always
+
+RequiresExpressionIndentation: OuterScope
+RequiresClausePosition: SingleLine
+
+IndentWrappedFunctionNames: true
+IndentExternBlock: Indent
+IndentExportBlock: true
+IndentWidth: 4
+
+RemoveEmptyLinesInUnwrappedLines: true
+RemoveParentheses: ReturnStatement
+RemoveBracesLLVM: true
+RemoveSemicolon: true
+
+SortUsingDeclarations: LexicographicNumeric
+SortIncludes: false
+
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeCpp11BracedList: true
+
+PackConstructorInitializers: CurrentLine
+WrapNamespaceBodyWithEmptyLines: Never
+LambdaBodyIndentation: OuterScope
+SeparateDefinitionBlocks: Always
+FixNamespaceComments: true
+BitFieldColonSpacing: Both
+Cpp11BracedListStyle: true
+ReflowComments: IndentOnly
+NamespaceIndentation: All
+QualifierAlignment: Left
+ReferenceAlignment: Left
+PointerAlignment: Left
+IncludeBlocks: Preserve
+AccessModifierOffset: -4
+IncludeCategories:
+  - Regex: '.*'
+    Priority: 1
+ColumnLimit: 0
+UseTab: Always
+TabWidth: 4

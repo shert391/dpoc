@@ -1,4 +1,4 @@
-#ifdef __um__
+﻿#ifdef __um__
 #pragma once
 #include <string>
 #include <windows.h>
@@ -11,6 +11,6 @@
 using namespace std;
 using namespace std::filesystem;
 
-bool loadDriver(_In_ const wchar_t* pDriverPath);
-bool unloadDriver(_In_ const wchar_t* pDriverPath);
+bool loadDriver (IN const wchar_t* pDriverPath);
+bool unloadDriver (IN const wchar_t* pDriverPath);
 #endif // __um__

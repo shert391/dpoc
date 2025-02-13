@@ -1,9 +1,9 @@
-#include "drv.h"
+﻿#include "drv.h"
 
 #ifdef __um__
-bool loadDriver(_In_ const wchar_t* pDriverPath) {
+bool loadDriver (IN const wchar_t* pDriverPath) {
 	// create drv reg entry
-	HKEY hKey{ 0 };
+	HKEY	hKey {0};
 	wstring wsRegPath = L"SYSTEM\\CurrentControlSet\\Services\\" + path(pDriverPath).filename().replace_extension().wstring();
 	clstatus(RegCreateKey(HKEY_LOCAL_MACHINE, wsRegPath.c_str(), &hKey));
 
@@ -12,8 +12,8 @@ bool loadDriver(_In_ const wchar_t* pDriverPath) {
 	clstatus(RegSetValueEx(hKey, L"ImagePath", 0, REG_EXPAND_SZ, (const BYTE*)wsObjPath.c_str(), wcslen(wsObjPath.c_str()) * sizeof(wchar_t) + 2));
 
 	// get full reg path
-	UNICODE_STRING uFullRegPath{ 0 };
-	wstring wsFullRegPath = wstring(L"\\Registry\\Machine") + wsRegPath;
+	UNICODE_STRING uFullRegPath {0};
+	wstring		   wsFullRegPath = wstring(L"\\Registry\\Machine") + wsRegPath;
 	RtlInitUnicodeString(&uFullRegPath, (wchar_t*)wsFullRegPath.c_str());
 
 	// add SeLoadDriverPrivilege for user
@@ -26,14 +26,12 @@ bool loadDriver(_In_ const wchar_t* pDriverPath) {
 	// load driver
 	NTSTATUS ntstatus = NtLoadDriver(&uFullRegPath);
 	if (ntstatus == STATUS_IMAGE_ALREADY_LOADED ||
-		ntstatus == STATUS_OBJECT_NAME_COLLISION) {
+		ntstatus == STATUS_OBJECT_NAME_COLLISION)
 		return true;
-	}
 	cntstatus(ntstatus);
 }
 
-bool unloadDriver(_In_ const wchar_t* pDriverPath)
-{
+bool unloadDriver (IN const wchar_t* pDriverPath) {
 	// delete reg key
 	wstring wsRegPath = L"SYSTEM\\CurrentControlSet\\Services\\" + path(pDriverPath).filename().replace_extension().wstring();
 	clstatus(RegDeleteKey(HKEY_LOCAL_MACHINE, wsRegPath.c_str()));
@@ -43,8 +41,8 @@ bool unloadDriver(_In_ const wchar_t* pDriverPath)
 	cntstatus(RtlAdjustPrivilege(0xA, true, false, &oldValue));
 
 	// get full reg path
-	UNICODE_STRING uFullRegPath{ 0 };
-	wstring wsFullRegPath = wstring(L"\\Registry\\Machine") + wsRegPath;
+	UNICODE_STRING uFullRegPath {0};
+	wstring		   wsFullRegPath = wstring(L"\\Registry\\Machine") + wsRegPath;
 	RtlInitUnicodeString(&uFullRegPath, (wchar_t*)wsFullRegPath.c_str());
 
 	// unload

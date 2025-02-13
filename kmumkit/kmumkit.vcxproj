@@ -71,6 +71,7 @@
     <ClCompile Include="drv.cpp" />
     <ClCompile Include="ntos.cpp" />
     <ClCompile Include="sig.cpp" />
+    <ClCompile Include="win.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="amd64.h" />
@@ -81,6 +82,7 @@
     <ClInclude Include="ntstatus.h" />
     <ClInclude Include="sig.h" />
     <ClInclude Include="ut.h" />
+    <ClInclude Include="win.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{11334C07-CB22-CC6B-1AD0-D299E8BA9380}</ProjectGuid>

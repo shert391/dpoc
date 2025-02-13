@@ -1,25 +1,18 @@
-#include "global.h"
+﻿#include "global.h"
 
 void* g_PiDDBCacheTable;
 
-void cInit()
-{
-
+void cInit () {
 }
 
-void cDdbCacheTable()
-{
+void cDdbCacheTable () {
 }
 
-void cShowDdbCacheTable()
-{
-
+void cShowDdbCacheTable () {
 }
 
-void cMmUnloadedDrivers()
-{
+void cMmUnloadedDrivers () {
 }
 
-void cMmLastUnloadedDrivers()
-{
+void cMmLastUnloadedDrivers () {
 }

@@ -1,8 +1,7 @@
 ﻿#include "global.h"
 
 // загрузка драйвера провайдера
-void prov::prvDrvLoad()
-{
+void prov::prvDrvLoad () {
 	prvDrvCreate();
 	loadDriver(m_info_.szDriverPath);
 	m_hDevice = CreateFileW(m_info_.szDevicePath, GENERIC_ALL, 0, nullptr, OPEN_EXISTING, 0, 0);
@@ -10,15 +9,13 @@ void prov::prvDrvLoad()
 }
 
 // выгрузка
-void prov::prvDrvUnload()
-{
+void prov::prvDrvUnload () {
 	CloseHandle(m_hDevice);
 	unloadDriver(m_info_.szDriverPath);
 	ctrue(DeleteFile(m_info_.szDriverPath));
 }
 
-void prov::drvload(const wchar_t* szDrvPath)
-{
+void prov::drvload (const wchar_t* szDrvPath) {
 	void* pCiOptions = ntGetCiOptions();
 
 	prvDrvLoad();
@@ -29,8 +26,7 @@ void prov::drvload(const wchar_t* szDrvPath)
 	prvDrvUnload();
 }
 
-void prov::prvDrvCreate()
-{
+void prov::prvDrvCreate () {
 	if (exists(path(m_info_.szDriverPath)))
 		return;
 
