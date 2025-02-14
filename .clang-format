@@ -1,4 +1,6 @@
 ﻿# https://clang.llvm.org/docs/ClangFormatStyleOptions.html#alignconsecutivedeclarations
+# clang-format version 21.0.0
+
 Standard: Latest
 
 AlignConsecutiveTableGenBreakingDAGArgColons:
