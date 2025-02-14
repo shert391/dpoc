@@ -75,6 +75,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="amd64.h" />
+    <ClInclude Include="conf.h" />
     <ClInclude Include="dbg.h" />
     <ClInclude Include="drv.h" />
     <ClInclude Include="ntdll.h" />

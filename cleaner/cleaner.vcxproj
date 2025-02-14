@@ -71,9 +71,11 @@
   <PropertyGroup />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
+    <OutDir>$(SolutionDir)build\debug\drv\cleaner</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
+    <OutDir>$(SolutionDir)build\release\drv\cleaner</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
@@ -91,7 +93,11 @@
     <ClCompile>
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
       <PreprocessorDefinitions>_WIN64;_AMD64_;AMD64;%(PreprocessorDefinitions);__km__</PreprocessorDefinitions>
+      <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
+    <Link>
+      <EntryPointSymbol>DriverEntry</EntryPointSymbol>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <DriverSign>
@@ -103,7 +109,11 @@
     <ClCompile>
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
       <PreprocessorDefinitions>_WIN64;_AMD64_;AMD64;%(PreprocessorDefinitions);__km__</PreprocessorDefinitions>
+      <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
+    <Link>
+      <EntryPointSymbol>DriverEntry</EntryPointSymbol>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <DriverSign>

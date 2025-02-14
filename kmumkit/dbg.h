@@ -1,7 +1,7 @@
 ﻿#pragma once
 #pragma region all
-#define prefixdbg     "[~] "
-#define prefixerror   "[-] "
+#define prefixdbg	  "[~] "
+#define prefixerror	  "[-] "
 #define prefixsuccess "[+] "
 
 #ifdef _DEBUG
@@ -12,23 +12,23 @@
 #pragma endregion
 
 #ifdef __um__
-#define сreset      "\033[0m"
-#define black       "\033[30m"        /* Black */
-#define red         "\033[31m"        /* Red */
-#define green       "\033[32m"        /* Green */
-#define yellow      "\033[33m"        /* Yellow */
-#define blue        "\033[34m"        /* Blue */
-#define magenta     "\033[35m"        /* Magenta */
-#define cyan        "\033[36m"        /* Cyan */
-#define white       "\033[37m"        /* White */
-#define boldblack   "\033[1m\033[30m" /* Bold Black */
-#define boldred     "\033[1m\033[31m" /* Bold Red */
-#define boldgreen   "\033[1m\033[32m" /* Bold Green */
-#define boldyellow  "\033[1m\033[33m" /* Bold Yellow */
-#define boldblue    "\033[1m\033[34m" /* Bold Blue */
+#define сreset		"\033[0m"
+#define black		"\033[30m"		  /* Black */
+#define red			"\033[31m"		  /* Red */
+#define green		"\033[32m"		  /* Green */
+#define yellow		"\033[33m"		  /* Yellow */
+#define blue		"\033[34m"		  /* Blue */
+#define magenta		"\033[35m"		  /* Magenta */
+#define cyan		"\033[36m"		  /* Cyan */
+#define white		"\033[37m"		  /* White */
+#define boldblack	"\033[1m\033[30m" /* Bold Black */
+#define boldred		"\033[1m\033[31m" /* Bold Red */
+#define boldgreen	"\033[1m\033[32m" /* Bold Green */
+#define boldyellow	"\033[1m\033[33m" /* Bold Yellow */
+#define boldblue	"\033[1m\033[34m" /* Bold Blue */
 #define boldmagenta "\033[1m\033[35m" /* Bold Magenta */
-#define boldcyan    "\033[1m\033[36m" /* Bold Cyan */
-#define boldwhite   "\033[1m\033[37m" /* Bold White */
+#define boldcyan	"\033[1m\033[36m" /* Bold Cyan */
+#define boldwhite	"\033[1m\033[37m" /* Bold White */
 
 #define fm(flags, msgid)           \
 	wchar_t* pMsgBuffer = nullptr; \
@@ -68,6 +68,12 @@
 	if (handle == INVALID_HANDLE_VALUE) {                                     \
 		error("INVALID_HANDLE_VALUE; GetLastError() = 0x%X", GetLastError()); \
 		dbgbp;                                                                \
+	}
+
+#define cnull(ptr)                                                      \
+	if (ptr == nullptr) {                                               \
+		error("Fail exec func; GetLastError() = 0x%X", GetLastError()); \
+		dbgbp;                                                          \
 	}
 
 #define ctrue(value)                                                    \

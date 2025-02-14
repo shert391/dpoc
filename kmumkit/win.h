@@ -1,7 +1,9 @@
 ﻿#pragma once
-#include "dbg.h"
-#include <string>
+
+#ifdef __um__
 #include <windows.h>
+#include <string>
+#include "dbg.h"
 
 using namespace std;
 
@@ -15,8 +17,9 @@ using namespace std;
 #define getDrvDirW(c)                                                     \
 	[] () {                                                               \
 		wchar_t szCurrDir[MAX_PATH * 2] {};                               \
-		GetSystemDirectoryW(MAX_PATH * 2, szCurrDir);                     \
+		GetSystemDirectoryW(szCurrDir, MAX_PATH * 2);                     \
 		return wstring(szCurrDir) + wstring(L"\\drivers\\") + wstring(c); \
 	}().c_str()
 
 void* mapfile (const wchar_t* szPath);
+#endif

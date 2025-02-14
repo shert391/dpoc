@@ -24,6 +24,9 @@
     <ClCompile Include="ntos.cpp">
       <Filter>km</Filter>
     </ClCompile>
+    <ClCompile Include="win.cpp">
+      <Filter>um</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="drv.h">
@@ -49,6 +52,10 @@
     </ClInclude>
     <ClInclude Include="ntstatus.h">
       <Filter>km</Filter>
+    </ClInclude>
+    <ClInclude Include="conf.h" />
+    <ClInclude Include="win.h">
+      <Filter>um</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

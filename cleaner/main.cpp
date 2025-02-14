@@ -1,7 +1,6 @@
 ﻿#include "global.h"
 
 void Unload (IN PDRIVER_OBJECT DriverObject) {
-	UNREFERENCED_PARAMETER(DriverObject);
 	DbgPrint("Unload\n");
 }
 

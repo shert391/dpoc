@@ -2,9 +2,9 @@
 
 #ifdef __um__
 void* ntGetCiOptions () {
-	void*	  pCiImageBase = ntGetImageBase(L"CI.dll");
-	uintptr_t rvaCiOptions = ntGetRvaCiOptions();
-	void*	  pCiOptions   = (void*)((uintptr_t)pCiImageBase + rvaCiOptions);
+	void* pCiImageBase = ntGetImageBase(L"CI.dll");
+	auto  rvaCiOptions = ntGetRvaCiOptions(pCiImageBase);
+	void* pCiOptions   = (void*)((uintptr_t)pCiImageBase + rvaCiOptions);
 	return pCiOptions;
 }
 
@@ -26,7 +26,7 @@ physaddr ntGetPml4Base (funcReadPa fnRead) {
 	return nullptr;
 }
 
-void* ntGetImageBase (const wchar_t* szModuleName) {
+void* ntGetImageBase (IN const wchar_t* szModuleName) {
 	ULONG	 size {0};
 	NTSTATUS ntstatus = NtQuerySystemInformation(SystemModuleInformation, nullptr, 0, &size);
 
@@ -50,7 +50,11 @@ void* ntGetImageBase (const wchar_t* szModuleName) {
 	return nullptr;
 }
 
-uintptr_t ntGetRvaCiOptions () {
-	return 0;
+uintptr_t ntGetRvaCiOptions (IN void* pImageBaseKrnl) {
+	const wchar_t* szCiPath	  = getDrvDirW(L"CI.dll");
+	void*		   pImageBase = mapfile(szCiPath);
+	void*		   pCiOptions = scanInSection(pImageBase, "PAGE", SIG_CI_OPTIONS, sizeof(SIG_CI_OPTIONS));
+	auto		   rva		  = (uintptr_t)pCiOptions - (uintptr_t)(pImageBase);
+	return rva;
 }
 #endif // __um__

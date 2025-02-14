@@ -2,6 +2,7 @@
 
 #ifdef __km__
 #include <ntddk.h>
+#include <ntimage.h>
 #endif // __km__
 
 #ifdef __um__
