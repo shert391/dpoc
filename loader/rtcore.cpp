@@ -1,5 +1,4 @@
 ﻿#include "global.h"
-#include "rtcore.h"
 
 void rtcore::read (IN void* pFrom, OUT void* pDst, IN size_t size) {
 	rwbuff buff {0};

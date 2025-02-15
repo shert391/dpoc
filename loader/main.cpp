@@ -2,6 +2,6 @@
 
 int main () {
 	setlocale(LC_ALL, "Russian");
-	loadDriver(L"C:\\Users\\User\\source\\repos\\drv\\x64\\Debug\\drv.sys");
-	std::cout << "Hello World!\n";
+	auto a = path(L"C:\\Users\\User\\source\\repos\\drv\\x64\\Debug\\drv.sys");
+	rtcore().drvload(a);
 }

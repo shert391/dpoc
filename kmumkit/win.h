@@ -1,25 +1,22 @@
 ﻿#pragma once
+#pragma region all
+#define WMAX_PATH MAX_PATH * 2
+#pragma endregion
 
 #ifdef __um__
-#include <windows.h>
-#include <string>
-#include "dbg.h"
-
-using namespace std;
-
 #define getCurrDirW(c)                                 \
 	[] () {                                            \
 		wchar_t szCurrDir[MAX_PATH * 2] {};            \
 		GetCurrentDirectoryW(MAX_PATH * 2, szCurrDir); \
-		return wstring(szCurrDir) + wstring(c);        \
-	}().c_str()
+		return path(szCurrDir) / c;                    \
+	}()
 
-#define getDrvDirW(c)                                                     \
-	[] () {                                                               \
-		wchar_t szCurrDir[MAX_PATH * 2] {};                               \
-		GetSystemDirectoryW(szCurrDir, MAX_PATH * 2);                     \
-		return wstring(szCurrDir) + wstring(L"\\drivers\\") + wstring(c); \
-	}().c_str()
+#define getDrvDirW(c)                                 \
+	[] () {                                           \
+		wchar_t szCurrDir[MAX_PATH * 2] {};           \
+		GetSystemDirectoryW(szCurrDir, MAX_PATH * 2); \
+		return path(szCurrDir) / c;                   \
+	}()
 
-void* mapfile (const wchar_t* szPath);
+void* mapfile (path& path);
 #endif

@@ -1,4 +1,4 @@
-﻿#include "amd64.h"
+﻿#include "global.h"
 
 #ifdef __um__
 physaddr getPa4lvl (IN void* va, IN physaddr pPml4Base, IN funcReadPa fnRead) {

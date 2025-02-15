@@ -122,6 +122,7 @@ BitFieldColonSpacing: Both
 Cpp11BracedListStyle: true
 ReflowComments: IndentOnly
 NamespaceIndentation: All
+MaxEmptyLinesToKeep: 1
 QualifierAlignment: Left
 ReferenceAlignment: Left
 PointerAlignment: Left

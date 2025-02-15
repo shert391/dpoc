@@ -1,18 +1,5 @@
 ﻿#pragma once
-#ifdef __km__
-#include <ntddk.h>
-#endif // __km__
-
-#ifdef __um__
-#include <functional>
-#include <windows.h>
-
-using namespace std;
-#endif // __um__
-
 #pragma region all
-#include "dbg.h"
-
 typedef void* physaddr;
 
 #define PAGE_4K_SIZE 4096	 // 4KB

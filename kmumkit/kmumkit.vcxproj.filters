@@ -57,5 +57,6 @@
     <ClInclude Include="win.h">
       <Filter>um</Filter>
     </ClInclude>
+    <ClInclude Include="global.h" />
   </ItemGroup>
 </Project>

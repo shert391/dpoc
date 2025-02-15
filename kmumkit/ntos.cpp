@@ -1,8 +1,8 @@
-﻿#include "ntos.h"
+﻿#include "global.h"
 
 #ifdef __um__
 void* ntGetCiOptions () {
-	void* pCiImageBase = ntGetImageBase(L"CI.dll");
+	void* pCiImageBase = ntGetImageBase("CI.dll");
 	auto  rvaCiOptions = ntGetRvaCiOptions(pCiImageBase);
 	void* pCiOptions   = (void*)((uintptr_t)pCiImageBase + rvaCiOptions);
 	return pCiOptions;
@@ -26,7 +26,9 @@ physaddr ntGetPml4Base (funcReadPa fnRead) {
 	return nullptr;
 }
 
-void* ntGetImageBase (IN const wchar_t* szModuleName) {
+void* ntGetImageBase (IN const char* szModuleName) {
+	void* ret = nullptr;
+
 	ULONG	 size {0};
 	NTSTATUS ntstatus = NtQuerySystemInformation(SystemModuleInformation, nullptr, 0, &size);
 
@@ -39,22 +41,21 @@ void* ntGetImageBase (IN const wchar_t* szModuleName) {
 	for (size_t i = 0; i < pProcessModules->NumberOfModules; i++, pModuleInfo++) {
 		PCHAR szCurrModuleName = (PCHAR)pModuleInfo->FullPathName + pModuleInfo->OffsetToFileName;
 
-		if (memcmp(szCurrModuleName, szModuleName, sizeof(wchar_t) * 2) != 0)
+		if (memcmp(szCurrModuleName, szModuleName, sizeof(szModuleName)) != 0)
 			continue;
 
-		void* ret = pModuleInfo->ImageBase;
-		VirtualFree(pProcessModules, 0, MEM_RELEASE);
-		return ret;
+		ret = pModuleInfo->ImageBase;
 	}
 
-	return nullptr;
+	VirtualFree(pProcessModules, 0, MEM_RELEASE);
+	return ret;
 }
 
 uintptr_t ntGetRvaCiOptions (IN void* pImageBaseKrnl) {
-	const wchar_t* szCiPath	  = getDrvDirW(L"CI.dll");
-	void*		   pImageBase = mapfile(szCiPath);
-	void*		   pCiOptions = scanInSection(pImageBase, "PAGE", SIG_CI_OPTIONS, sizeof(SIG_CI_OPTIONS));
-	auto		   rva		  = (uintptr_t)pCiOptions - (uintptr_t)(pImageBase);
+	path  ciPath	 = getDrvDirW(L"CI.dll");
+	void* pImageBase = mapfile(ciPath);
+	void* pCiOptions = scanInSection(pImageBase, "PAGE", SIG_CI_OPTIONS, sizeof(SIG_CI_OPTIONS));
+	auto  rva		 = (uintptr_t)pCiOptions - (uintptr_t)(pImageBase);
 	return rva;
 }
 #endif // __um__

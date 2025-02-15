@@ -1,18 +1,16 @@
-﻿#include "sig.h"
+﻿#include "global.h"
 
 #pragma region all
 
 void* scanInSection (IN void* pImageBase, const IN char* pSectionName, const IN char* pPattern, IN size_t sizePattern) {
 	auto* pDosHeader = (IMAGE_DOS_HEADER*)pImageBase;
 	auto* pNtHeaders = (IMAGE_NT_HEADERS64*)((uintptr_t)pImageBase + pDosHeader->e_lfanew);
-
 	for (IMAGE_SECTION_HEADER* curSection = IMAGE_FIRST_SECTION(pNtHeaders); curSection != nullptr; curSection++) {
 		if (strcmp((PCSTR)curSection->Name, pSectionName) == 0) {
 			auto* pBaseSection = (void*)((uintptr_t)pImageBase + curSection->VirtualAddress);
 			return scan(pBaseSection, pPattern, sizePattern, curSection->SizeOfRawData);
 		}
 	}
-
 	return nullptr;
 }
 
@@ -25,7 +23,6 @@ void* scan (IN void* pBase, const IN char* pPattern, IN size_t sizePattern, IN s
 		if (j == sizePattern)
 			return (void*)((uintptr_t)pBase + i);
 	}
-
 	return nullptr;
 }
 

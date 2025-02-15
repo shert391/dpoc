@@ -1,39 +1,38 @@
-﻿#include "drv.h"
+﻿#include "global.h"
 
 #ifdef __um__
-bool loadDriver (IN const wchar_t* pDriverPath) {
-	// create drv reg entry
-	HKEY	hKey {0};
-	wstring wsRegPath = L"SYSTEM\\CurrentControlSet\\Services\\" + path(pDriverPath).filename().replace_extension().wstring();
-	clstatus(RegCreateKey(HKEY_LOCAL_MACHINE, wsRegPath.c_str(), &hKey));
+void loadDriver (IN path& pDriverPath) {
+	HKEY hKey {0};
+	path regPath = L"System\\CurrentControlSet\\Services\\" / pDriverPath.filename().replace_extension();
+	clstatus(RegCreateKey(HKEY_LOCAL_MACHINE, regPath.c_str(), &hKey));
 
-	// add ImagePath value
-	wstring wsObjPath = L"\\??\\" + wstring(pDriverPath);
-	clstatus(RegSetValueEx(hKey, L"ImagePath", 0, REG_EXPAND_SZ, (const BYTE*)wsObjPath.c_str(), wcslen(wsObjPath.c_str()) * sizeof(wchar_t) + 2));
+	wstring objPath = wstring(L"\\??\\") + pDriverPath.wstring();
+	clstatus(RegSetValueEx(hKey, L"ImagePath", 0, REG_EXPAND_SZ, (const BYTE*)objPath.c_str(), wcslen(objPath.c_str()) * sizeof(wchar_t) + 2));
 
-	// get full reg path
+	const wchar_t* szType = L"Type";
+	DWORD		   vType  = 1;
+	RegSetValueEx(hKey, szType, 0, REG_DWORD, (PBYTE)&vType, sizeof(DWORD));
+
 	UNICODE_STRING uFullRegPath {0};
-	wstring		   wsFullRegPath = wstring(L"\\Registry\\Machine") + wsRegPath;
+	path		   wsFullRegPath = L"\\Registry\\Machine" / regPath;
 	RtlInitUnicodeString(&uFullRegPath, (wchar_t*)wsFullRegPath.c_str());
 
-	// add SeLoadDriverPrivilege for user
+	// выдаём привилегию SeLoadDriverPrivilege текущему пользователю
 	BOOLEAN oldValue;
 	cntstatus(RtlAdjustPrivilege(0xA, true, false, &oldValue));
 
-	// close reg key
 	RegCloseKey(hKey);
 
-	// load driver
 	NTSTATUS ntstatus = NtLoadDriver(&uFullRegPath);
 	if (ntstatus == STATUS_IMAGE_ALREADY_LOADED ||
 		ntstatus == STATUS_OBJECT_NAME_COLLISION)
-		return true;
+		return;
 	cntstatus(ntstatus);
 }
 
-bool unloadDriver (IN const wchar_t* pDriverPath) {
+void unloadDriver (IN path& pDriverPath) {
 	// delete reg key
-	wstring wsRegPath = L"SYSTEM\\CurrentControlSet\\Services\\" + path(pDriverPath).filename().replace_extension().wstring();
+	wstring wsRegPath = L"SYSTEM\\CurrentControlSet\\Services\\" / pDriverPath.filename().replace_extension();
 	clstatus(RegDeleteKey(HKEY_LOCAL_MACHINE, wsRegPath.c_str()));
 
 	// add SeLoadDriverPrivilege for user
@@ -48,6 +47,6 @@ bool unloadDriver (IN const wchar_t* pDriverPath) {
 	// unload
 	cntstatus(NtUnloadDriver(&uFullRegPath));
 
-	return true;
+	return;
 }
 #endif // __um__

@@ -78,6 +78,7 @@
     <ClInclude Include="conf.h" />
     <ClInclude Include="dbg.h" />
     <ClInclude Include="drv.h" />
+    <ClInclude Include="global.h" />
     <ClInclude Include="ntdll.h" />
     <ClInclude Include="ntos.h" />
     <ClInclude Include="ntstatus.h" />

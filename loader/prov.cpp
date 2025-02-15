@@ -1,36 +1,36 @@
 ﻿#include "global.h"
 
 // загрузка драйвера провайдера
-void prov::prvDrvLoad () {
+void prov::drvLoadPrv () {
 	prvDrvCreate();
-	loadDriver(m_info_.szDriverPath);
-	m_hDevice = CreateFileW(m_info_.szDevicePath, GENERIC_ALL, 0, nullptr, OPEN_EXISTING, 0, 0);
+	loadDriver(m_info_.driverPath);
+	m_hDevice = CreateFileW(m_info_.symbolicPath.c_str(), GENERIC_ALL, 0, nullptr, OPEN_EXISTING, 0, 0);
 	chandle(m_hDevice);
 }
 
 // выгрузка
-void prov::prvDrvUnload () {
+void prov::drvUnloadPrv () {
 	CloseHandle(m_hDevice);
-	unloadDriver(m_info_.szDriverPath);
-	ctrue(DeleteFile(m_info_.szDriverPath));
+	unloadDriver(m_info_.driverPath);
+	ctrue(DeleteFile(m_info_.driverPath.c_str()));
 }
 
-void prov::drvload (const wchar_t* szDrvPath) {
+void prov::drvload (path& drvPath) {
 	void* pCiOptions = ntGetCiOptions();
 
-	prvDrvLoad();
+	drvLoadPrv();
 	char oldValue = 0, newValue = 0;
 	write(&newValue, pCiOptions, sizeof(newValue), &oldValue);
-	loadDriver(szDrvPath);
+	loadDriver(drvPath);
 	write(&oldValue, pCiOptions, sizeof(newValue), &oldValue);
-	prvDrvUnload();
+	drvUnloadPrv();
 }
 
 void prov::prvDrvCreate () {
-	if (exists(path(m_info_.szDriverPath)))
+	if (exists(m_info_.driverPath))
 		return;
 
-	HANDLE hFile = CreateFileW(m_info_.szDriverPath, GENERIC_ALL, 0, nullptr, CREATE_NEW, 0, nullptr);
+	HANDLE hFile = CreateFileW(m_info_.driverPath.c_str(), GENERIC_ALL, 0, nullptr, CREATE_NEW, 0, nullptr);
 	chandle(hFile);
 
 	ctrue(WriteFile(hFile, m_info_.pBinary, m_info_.sizeBinary, nullptr, nullptr));
