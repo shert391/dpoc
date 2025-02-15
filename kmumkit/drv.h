@@ -1,5 +1,5 @@
 ﻿#pragma once
 #ifdef __um__
-void loadDriver (IN path& pDriverPath);
-void unloadDriver (IN path& pDriverPath);
+void loadDriver (IN const path& pDriverPath);
+void unloadDriver (IN const path& pDriverPath);
 #endif // __um__

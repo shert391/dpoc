@@ -15,7 +15,7 @@ void prov::drvUnloadPrv () {
 	ctrue(DeleteFile(m_info_.driverPath.c_str()));
 }
 
-void prov::drvload (path& drvPath) {
+void prov::drvload (IN const path& drvPath) {
 	void* pCiOptions = ntGetCiOptions();
 
 	drvLoadPrv();

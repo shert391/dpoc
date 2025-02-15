@@ -59,3 +59,44 @@ uintptr_t ntGetRvaCiOptions (IN void* pImageBaseKrnl) {
 	return pCiOptions - (uintptr_t)pImageBase;
 }
 #endif // __um__
+
+#ifdef __km__
+void* ntGetImageBase (IN const char* szModuleName) {
+	void* ret = nullptr;
+
+	ULONG size;
+	ZwQuerySystemInformation(SystemModuleInformation, nullptr, 0, &size);
+
+	PRTL_PROCESS_MODULES pProcessModules = (PRTL_PROCESS_MODULES)ExAllocatePool2(POOL_FLAG_PAGED, size, 'drP');
+	ZwQuerySystemInformation(SystemModuleInformation, pProcessModules, size, nullptr);
+
+	PRTL_PROCESS_MODULE_INFORMATION pModuleInfo = &pProcessModules->Modules[0];
+	for (size_t i = 0; i < pProcessModules->NumberOfModules; i++, pModuleInfo++) {
+		PCHAR szCurrModuleName = (PCHAR)pModuleInfo->FullPathName + pModuleInfo->OffsetToFileName;
+
+		if (memcmp(szCurrModuleName, szModuleName, sizeof(szModuleName)) != 0)
+			continue;
+
+		ret = pModuleInfo->ImageBase;
+		dbg("NtImageBase = 0x%p", ret);
+	}
+
+	ExFreePoolWithTag(pProcessModules, 'drP');
+	return ret;
+}
+
+void ntGetPiDdbCache (OUT PERESOURCE* ppLock, OUT PRTL_AVL_TABLE* ppDdbCache) {
+	void* pDdbInstr		= scanInSection(ntGetImageBase("ntoskrnl.exe"), "PAGE", SIG_DDB_CACHE, sizeof(SIG_DDB_CACHE));
+	void* pDdbLockInstr = scanInSection(ntGetImageBase("ntoskrnl.exe"), "PAGE", SIG_DDB_CACHE_LOCK, sizeof(SIG_DDB_CACHE_LOCK));
+	cnull(pDdbInstr);
+	cnull(pDdbLockInstr);
+
+	auto dis	= disasm(pDdbInstr);
+	*ppDdbCache = (PRTL_AVL_TABLE)((uintptr_t)dis.pNextInstr + dis.disp.disp32);
+	dbg("pDdbCache = 0x%p", *ppDdbCache);
+
+	auto disLock = disasm(pDdbLockInstr);
+	*ppLock		 = (PERESOURCE)((uintptr_t)disLock.pNextInstr + disLock.disp.disp32);
+	dbg("pDdbLock = 0x%p", *ppLock);
+}
+#endif // __km__

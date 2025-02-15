@@ -5,11 +5,24 @@
 #define prefixsuccess "[+] "
 
 #ifdef _DEBUG
-#define dbgbp __debugbreak()
+#define dbgbp __debugbreak();
 #else
 #define dbgbp
 #endif
 #pragma endregion
+
+#ifdef __km__
+#define cnull(p) \
+	if (!p) {    \
+		dbgbp    \
+	}
+#ifdef _DEBUG
+#define dbg(msg, ...) \
+	DbgPrint(prefixdbg msg, __VA_ARGS__);
+#else
+#define dbg(msg, ...)
+#endif
+#endif // __km__
 
 #ifdef __um__
 #define сreset		"\033[0m"

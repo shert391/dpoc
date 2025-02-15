@@ -1,7 +1,7 @@
 ﻿#include "global.h"
 
 #ifdef __um__
-void loadDriver (IN path& pDriverPath) {
+void loadDriver (IN const path& pDriverPath) {
 	HKEY hKey {0};
 	path regPath = L"System\\CurrentControlSet\\Services\\" / pDriverPath.filename().replace_extension();
 	clstatus(RegCreateKey(HKEY_LOCAL_MACHINE, regPath.c_str(), &hKey));
@@ -30,7 +30,7 @@ void loadDriver (IN path& pDriverPath) {
 	cntstatus(ntstatus);
 }
 
-void unloadDriver (IN path& pDriverPath) {
+void unloadDriver (IN const path& pDriverPath) {
 	// delete reg key
 	wstring wsRegPath = L"SYSTEM\\CurrentControlSet\\Services\\" / pDriverPath.filename().replace_extension();
 	clstatus(RegDeleteKey(HKEY_LOCAL_MACHINE, wsRegPath.c_str()));

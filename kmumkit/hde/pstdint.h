@@ -26,7 +26,15 @@
 
 #pragma once
 
+#ifdef __um__
 #include <windows.h>
+#endif // __um__
+#ifdef __km__
+#include <ntddk.h>
+#include <ntimage.h>
+
+typedef unsigned char* LPBYTE;
+#endif
 
 // Integer types for HDE.
 typedef INT8   int8_t;

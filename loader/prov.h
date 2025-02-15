@@ -17,7 +17,7 @@ private:
 public:
 	explicit prov (provconst info) : m_info_(info) {}
 
-	void drvload (path& drvPath);
+	void drvload (IN const path& drvPath);
 
 private:
 	void drvLoadPrv ();
