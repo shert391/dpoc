@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "conf", "conf", "{A215FFBF-C
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "test\test.vcxproj", "{1CE660BC-B813-40FF-B5E6-AA4209918ED3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		debug_km|x64 = debug_km|x64
@@ -58,6 +60,14 @@ Global
 		{C4FC7235-442D-4032-ACB0-8B257B5B958D}.release_km|x64.Build.0 = Release|x64
 		{C4FC7235-442D-4032-ACB0-8B257B5B958D}.release_um|x64.ActiveCfg = Release|x64
 		{C4FC7235-442D-4032-ACB0-8B257B5B958D}.release_um|x64.Build.0 = Release|x64
+		{1CE660BC-B813-40FF-B5E6-AA4209918ED3}.debug_km|x64.ActiveCfg = Debug|x64
+		{1CE660BC-B813-40FF-B5E6-AA4209918ED3}.debug_km|x64.Build.0 = Debug|x64
+		{1CE660BC-B813-40FF-B5E6-AA4209918ED3}.debug_um|x64.ActiveCfg = Debug|x64
+		{1CE660BC-B813-40FF-B5E6-AA4209918ED3}.debug_um|x64.Build.0 = Debug|x64
+		{1CE660BC-B813-40FF-B5E6-AA4209918ED3}.release_km|x64.ActiveCfg = Release|x64
+		{1CE660BC-B813-40FF-B5E6-AA4209918ED3}.release_km|x64.Build.0 = Release|x64
+		{1CE660BC-B813-40FF-B5E6-AA4209918ED3}.release_um|x64.ActiveCfg = Release|x64
+		{1CE660BC-B813-40FF-B5E6-AA4209918ED3}.release_um|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

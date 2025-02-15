@@ -10,6 +10,9 @@
     <Filter Include="km">
       <UniqueIdentifier>{b2f98830-aa2b-4e11-bee4-15ab9d415321}</UniqueIdentifier>
     </Filter>
+    <Filter Include="hde">
+      <UniqueIdentifier>{e7c5a9db-787d-4337-8d5e-18d2e81ab425}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="drv.cpp">
@@ -26,6 +29,9 @@
     </ClCompile>
     <ClCompile Include="win.cpp">
       <Filter>um</Filter>
+    </ClCompile>
+    <ClCompile Include="hde\hde64.c">
+      <Filter>hde</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -58,5 +64,14 @@
       <Filter>um</Filter>
     </ClInclude>
     <ClInclude Include="global.h" />
+    <ClInclude Include="hde\hde64.h">
+      <Filter>hde</Filter>
+    </ClInclude>
+    <ClInclude Include="hde\pstdint.h">
+      <Filter>hde</Filter>
+    </ClInclude>
+    <ClInclude Include="hde\table64.h">
+      <Filter>hde</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

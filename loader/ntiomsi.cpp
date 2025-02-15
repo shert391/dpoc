@@ -7,8 +7,8 @@ void ntiomsi::read (IN void* pFrom, OUT void* pDst, IN size_t size) {
 }
 
 void ntiomsi::write (IN void* pFrom, IN void* pDst, IN size_t size, OUT void* pOld) {
-	physaddr pSysPml4Base = ntGetPml4Base(funcptr(ioreadpa));
-	physaddr pa			  = getPa4lvl(pDst, pSysPml4Base, funcptr(ioreadpa));
+	physaddr pml4Base = ntGetPml4Base(funcptr(ioreadpa));
+	physaddr pa			  = getPa4lvl(pDst, pml4Base, funcptr(ioreadpa));
 	iowritepa(pFrom, pa, size, pOld);
 }
 
@@ -18,10 +18,8 @@ void ntiomsi::ioreadpa (IN physaddr pFrom, OUT void* pDst, IN size_t size) {
 	buff.blockCount	 = size;
 	buff.blockLength = 1;
 
-	if (!DeviceIoControl(m_hDevice, CTL_READPA, &buff, sizeof(buff), &buff, sizeof(buff), nullptr, nullptr))
-		error("ntiomsi readpa fail!");
-
-	memcpy(pDst, &buff.wrBuff, size);
+	if (!DeviceIoControl(m_hDevice, CTL_READPA, &buff, READ_BUFF_SIZE, pDst, size, nullptr, nullptr))
+		error("ntiomsi readpa fail! GetLastError = 0x%X", GetLastError());
 }
 
 void ntiomsi::iowritepa (IN void* pFrom, IN physaddr pDst, IN size_t size, OUT void* pOld) {

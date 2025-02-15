@@ -17,10 +17,7 @@ physaddr ntGetPml4Base (funcReadPa fnRead) {
 	for (uintptr_t pa = 0x10000; pa <= RM_SIZE; pa += PAGE_4K_SIZE) {
 		fnRead((physaddr)pa, (void*)&psb, sizeof(psb));
 		if (psb.Jmp.OpCode != 0xe9 || psb.CompletionFlag != true) continue;
-		physaddr ppPml4Base = (physaddr)(pa + FIELD_OFFSET(_PROCESSOR_START_BLOCK, ProcessorState) + FIELD_OFFSET(KSPECIAL_REGISTERS, Cr3));
-		physaddr pPml4Base	= nullptr;
-		fnRead(ppPml4Base, (void*)&pPml4Base, sizeof(psb));
-		return pPml4Base;
+		return (physaddr)psb.ProcessorState.SpecialRegisters.Cr3;
 	}
 
 	return nullptr;
@@ -52,10 +49,13 @@ void* ntGetImageBase (IN const char* szModuleName) {
 }
 
 uintptr_t ntGetRvaCiOptions (IN void* pImageBaseKrnl) {
-	path  ciPath	 = getDrvDirW(L"CI.dll");
-	void* pImageBase = mapfile(ciPath);
-	void* pCiOptions = scanInSection(pImageBase, "PAGE", SIG_CI_OPTIONS, sizeof(SIG_CI_OPTIONS));
-	auto  rva		 = (uintptr_t)pCiOptions - (uintptr_t)(pImageBase);
-	return rva;
+	path  ciPath		  = getDrvDirW(L"CI.dll");
+	void* pImageBase	  = mapfile(ciPath);
+	void* pCiOptionsInstr = scanInSection(pImageBase, "PAGE", SIG_CI_OPTIONS, sizeof(SIG_CI_OPTIONS));
+
+	hde64s	  disasm	 = disasm(pCiOptionsInstr);
+	uintptr_t pCiOptions = (uintptr_t)disasm.pNextInstr + (int)disasm.disp.disp32;
+
+	return pCiOptions - (uintptr_t)pImageBase;
 }
 #endif // __um__

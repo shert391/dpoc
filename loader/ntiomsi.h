@@ -4,6 +4,8 @@
 #define CTL_READPA	CTL_CODE(0xC350, 0x841, METHOD_BUFFERED, FILE_READ_ACCESS)	// 0xC3506104
 #define CTL_WRITEPA CTL_CODE(0xC350, 0x842, METHOD_BUFFERED, FILE_WRITE_ACCESS) // 0xC350A108
 
+#define READ_BUFF_SIZE 0x10
+
 class ntiomsi : public prov {
 public:
 	ntiomsi () : prov({.driverPath	 = getCurrDirW(L"ntiomsi.sys"),
@@ -21,8 +23,8 @@ private:
 			physaddr pDst;
 		};
 
-		int blockCount;
 		int blockLength;
+		int blockCount;
 
 		union {
 			char unk[64];

@@ -15,6 +15,7 @@ using namespace std::filesystem;
 #endif
 
 #pragma region all
+#include "hde/hde64.h"
 #include "amd64.h"
 #include "dbg.h"
 #include "sig.h"
