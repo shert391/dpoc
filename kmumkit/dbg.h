@@ -16,9 +16,13 @@
 	if (!p) {    \
 		dbgbp    \
 	}
+#define ctrue(f) \
+	if (!f) {    \
+		dbgbp    \
+	}
 #ifdef _DEBUG
 #define dbg(msg, ...) \
-	DbgPrint(prefixdbg msg, __VA_ARGS__);
+	{ DbgPrintEx(DPFLTR_IHVDRIVER_ID, DPFLTR_ERROR_LEVEL, prefixdbg msg "\n", __VA_ARGS__); }
 #else
 #define dbg(msg, ...)
 #endif

@@ -1,5 +1,13 @@
 ﻿#include "global.h"
 
+#pragma region all
+
+void ntUnicodeStringToWchar (IN PUNICODE_STRING pUnicodeString, OUT wchar_t* pOut) {
+	memcpy(pOut, pUnicodeString->Buffer, pUnicodeString->Length);
+}
+
+#pragma endregion
+
 #ifdef __um__
 void* ntGetCiOptions () {
 	void* pCiImageBase = ntGetImageBase("CI.dll");
@@ -86,8 +94,9 @@ void* ntGetImageBase (IN const char* szModuleName) {
 }
 
 void ntGetPiDdbCache (OUT PERESOURCE* ppLock, OUT PRTL_AVL_TABLE* ppDdbCache) {
-	void* pDdbInstr		= scanInSection(ntGetImageBase("ntoskrnl.exe"), "PAGE", SIG_DDB_CACHE, sizeof(SIG_DDB_CACHE));
-	void* pDdbLockInstr = scanInSection(ntGetImageBase("ntoskrnl.exe"), "PAGE", SIG_DDB_CACHE_LOCK, sizeof(SIG_DDB_CACHE_LOCK));
+	void* ntosImageBase = ntGetImageBase("ntoskrnl.exe");
+	void* pDdbInstr		= scanInSection(ntosImageBase, "PAGE", SIG_DDB_CACHE, sizeof(SIG_DDB_CACHE));
+	void* pDdbLockInstr = scanInSection(ntosImageBase, "PAGE", SIG_DDB_CACHE_LOCK, sizeof(SIG_DDB_CACHE_LOCK));
 	cnull(pDdbInstr);
 	cnull(pDdbLockInstr);
 

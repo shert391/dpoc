@@ -1,4 +1,8 @@
 ﻿#pragma once
+#pragma region all
+void ntUnicodeStringToWchar (IN PUNICODE_STRING pUnicodeString, OUT wchar_t* pOut);
+#pragma endregion
+
 #ifdef __um__
 void*	  ntGetCiOptions ();
 physaddr  ntGetPml4Base (funcReadPa fnRead);
@@ -30,12 +34,12 @@ typedef struct _RTL_PROCESS_MODULES {
 } RTL_PROCESS_MODULES, *PRTL_PROCESS_MODULES;
 
 typedef struct PiDDBCacheEntry {
-	PiDDBCacheEntry* Flink;
-	PiDDBCacheEntry* Blink;
+	PiDDBCacheEntry* Left;
+	PiDDBCacheEntry* Right;
 	UNICODE_STRING	 DriverName;
 	ULONG			 TimeDateStamp;
 	NTSTATUS		 LoadStatus;
-}* PPiDDBCacheEntry;
+};
 
 typedef enum _SYSTEM_INFORMATION_CLASS {
 	SystemBasicInformation						  = 0,
