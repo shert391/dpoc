@@ -2,13 +2,13 @@
 #include "cleaner.h"
 
 void cInit () {
-	cDdbCacheTable();
-	cShowDdbCacheTable();
+	cMmShowUnloadedDrivers();
+	cMmUnloadedDrivers();
+	dbg("---------- CLEAR ----------");
+	cMmShowUnloadedDrivers();
 }
 
 void cDdbCacheTable () {
-	DbgBreakPoint();
-
 	PRTL_AVL_TABLE pDdbCache;
 	PERESOURCE	   pDdbLock;
 	ntGetPiDdbCache(&pDdbLock, &pDdbCache);
@@ -37,8 +37,32 @@ void cShowDdbCacheTable () {
 	ExReleaseResourceLite(pDdbLock);
 }
 
-void cMmUnloadedDrivers () {
+void cMmShowUnloadedDrivers () {
+	int*			  pMmLastUnloadedDriver;
+	PUNLOADED_DRIVERS mmUnloadedDrivers {0};
+	ntGetMmUnloadedDrivers((void**)&mmUnloadedDrivers, &pMmLastUnloadedDriver);
+
+	for (int i = 0; i < *pMmLastUnloadedDriver; i++) {
+		wchar_t pDriverName[32] {0};
+		ntUnicodeStringToWchar(&mmUnloadedDrivers[i].Name, pDriverName);
+		dbg("PUNLOADED_DRIVERS[%i] = 0x%p; DriverName = %ls; StartAddress = 0x%p; EndAddress = 0x%p", i, &mmUnloadedDrivers[i], pDriverName, mmUnloadedDrivers[i].StartAddress, mmUnloadedDrivers[i].EndAddress);
+	}
 }
 
-void cMmLastUnloadedDrivers () {
+#define MI_UNLOADED_DRIVERS 50
+
+void cMmUnloadedDrivers () {
+	int*			  pMmLastUnloadedDriver;
+	PUNLOADED_DRIVERS mmUnloadedDrivers {0};
+	ntGetMmUnloadedDrivers((void**)&mmUnloadedDrivers, &pMmLastUnloadedDriver);
+
+	UNICODE_STRING uDel;
+	RtlInitUnicodeString(&uDel, L"cleaner.sys");
+
+	for (int i = 0; i < *pMmLastUnloadedDriver; i++) {
+		if (RtlCompareUnicodeString(&uDel, &mmUnloadedDrivers[i].Name, false) != 0)
+			continue;
+		memcpy(&mmUnloadedDrivers[i], &mmUnloadedDrivers[i + 1], sizeof(UNLOADED_DRIVERS) * (MI_UNLOADED_DRIVERS - *pMmLastUnloadedDriver));
+		(*pMmLastUnloadedDriver)--;
+	}
 }

@@ -41,6 +41,13 @@ typedef struct PiDDBCacheEntry {
 	NTSTATUS		 LoadStatus;
 };
 
+typedef struct _UNLOADED_DRIVERS {
+	UNICODE_STRING Name;
+	PVOID		   StartAddress;
+	PVOID		   EndAddress;
+	LARGE_INTEGER  CurrentTime;
+} UNLOADED_DRIVERS, *PUNLOADED_DRIVERS;
+
 typedef enum _SYSTEM_INFORMATION_CLASS {
 	SystemBasicInformation						  = 0,
 	SystemProcessorInformation					  = 1, // obsolete...delete
@@ -135,6 +142,7 @@ IMPORT NTSTATUS NTAPI ZwQuerySystemInformation (
 	OUT PULONG ReturnLength		OPTIONAL);
 #pragma endregion
 
+void  ntGetMmUnloadedDrivers (OUT void** ppMmUnloadedDrivers, OUT int** ppMmLastUnloadedDriver);
 void  ntGetPiDdbCache (OUT PERESOURCE* ppLock, OUT PRTL_AVL_TABLE* ppDdbCache);
 void* ntGetImageBase (IN const char* szModuleName);
 #endif // __km__

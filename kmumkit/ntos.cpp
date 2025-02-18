@@ -93,6 +93,20 @@ void* ntGetImageBase (IN const char* szModuleName) {
 	return ret;
 }
 
+void ntGetMmUnloadedDrivers (OUT void** ppMmUnloadedDrivers, OUT int** pMmLastUnloadedDriver) {
+	void* ntosImageBase				  = ntGetImageBase("ntoskrnl.exe");
+	void* pMmUnloadedDriversInstr	  = scanInSection(ntosImageBase, ".text", SIG_MM_UNLOADED_DRIVERS, sizeof(SIG_MM_UNLOADED_DRIVERS));
+	void* pMmLastUnloadedDriversInstr = scanInSection(ntosImageBase, ".text", SIG_MM_LAST_UNLOADED_DRIVER, sizeof(SIG_MM_LAST_UNLOADED_DRIVER));
+
+	auto dis			 = disasm(pMmUnloadedDriversInstr);
+	*ppMmUnloadedDrivers = *(void**)((uintptr_t)dis.pNextInstr + dis.disp.disp32);
+	dbg("pMmUnloadedDrivers = 0x%p", *ppMmUnloadedDrivers);
+
+	auto disLast		   = disasm(pMmLastUnloadedDriversInstr);
+	*pMmLastUnloadedDriver = (int*)((uintptr_t)disLast.pNextInstr + disLast.disp.disp32);
+	dbg("LastUnloadedDriver(0x%p) = %i", *pMmLastUnloadedDriver, **pMmLastUnloadedDriver);
+}
+
 void ntGetPiDdbCache (OUT PERESOURCE* ppLock, OUT PRTL_AVL_TABLE* ppDdbCache) {
 	void* ntosImageBase = ntGetImageBase("ntoskrnl.exe");
 	void* pDdbInstr		= scanInSection(ntosImageBase, "PAGE", SIG_DDB_CACHE, sizeof(SIG_DDB_CACHE));
