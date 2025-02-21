@@ -6,28 +6,28 @@
 
 class rtcore : public prov {
 public:
-	rtcore () : prov({.driverPath	= getCurrDirW(L"RTCore64.sys"),
-					  .symbolicPath = L"\\??\\RtCore64",
-					  .sizeBinary	= sizeof(g_pRtCoreBin),
-					  .pBinary		= g_pRtCoreBin}) {
-	}
+    rtcore () : prov({.driverPath   = getCurrDirW(L"RTCore64.sys"),
+                      .symbolicPath = L"\\??\\RtCore64",
+                      .sizeBinary   = sizeof(g_pRtCoreBin),
+                      .pBinary      = g_pRtCoreBin}) {
+    }
 
-	void read (IN void* pFrom, OUT void* pDst, IN size_t size) override;
-	void write (IN void* pFrom, IN void* pDst, IN size_t size, OUT void* pOld) override;
+    void read (IN void* pFrom, OUT void* pDst, IN size_t size) override;
+    void write (IN void* pFrom, IN void* pDst, IN size_t size, OUT void* pOld) override;
 
 private:
-	struct rwbuff {
-		char unk0[8];
+    struct rwbuff {
+        char unk0[8];
 
-		union {
-			void* pDst;
-			void* pFrom;
-		};
+        union {
+            void* pDst;
+            void* pFrom;
+        };
 
-		char unk1[4];
-		int	 offset;
-		int	 size;
-		int	 data;
-		char unk2[16];
-	};
+        char unk1[4];
+        int  offset;
+        int  size;
+        int  data;
+        char unk2[16];
+    };
 };
