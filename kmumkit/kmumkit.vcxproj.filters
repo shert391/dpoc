@@ -33,6 +33,9 @@
     <ClCompile Include="hde\hde64.c">
       <Filter>hde</Filter>
     </ClCompile>
+    <ClCompile Include="file.cpp">
+      <Filter>ex</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="drv.h">
@@ -72,6 +75,9 @@
     </ClInclude>
     <ClInclude Include="hde\table64.h">
       <Filter>hde</Filter>
+    </ClInclude>
+    <ClInclude Include="file.h">
+      <Filter>ex</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

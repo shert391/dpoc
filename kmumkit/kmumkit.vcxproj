@@ -69,6 +69,7 @@
   <ItemGroup>
     <ClCompile Include="amd64.cpp" />
     <ClCompile Include="drv.cpp" />
+    <ClCompile Include="file.cpp" />
     <ClCompile Include="hde\hde64.c" />
     <ClCompile Include="ntos.cpp" />
     <ClCompile Include="sig.cpp" />
@@ -79,6 +80,7 @@
     <ClInclude Include="conf.h" />
     <ClInclude Include="dbg.h" />
     <ClInclude Include="drv.h" />
+    <ClInclude Include="file.h" />
     <ClInclude Include="global.h" />
     <ClInclude Include="hde\hde64.h" />
     <ClInclude Include="hde\pstdint.h" />

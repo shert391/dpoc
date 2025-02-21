@@ -53,7 +53,7 @@
 
 #ifdef _DEBUG
 #define dbg(msg, ...) \
-	printf(prefixdbg msg, __VA_ARGS__);
+	printf(prefixdbg msg "\n", __VA_ARGS__);
 #else
 #define dbg(msg, ...)
 #endif
@@ -62,33 +62,39 @@
 	printf(color p msg сreset, __VA_ARGS__)
 
 #define error(msg, ...) \
-	prf(red, prefixerror, "%s -> " msg, __func__, __VA_ARGS__)
+	prf(red, prefixerror, "%s -> \n" msg, __func__, __VA_ARGS__)
 
 #define success(msg, ...) \
 	prf(green, prefixsuccess, msg, __VA_ARGS__)
 
-#define cntstatus(status)                                     \
-	if (!NT_SUCCESS(status)) {                                \
-		prf(red, prefixerror, "%s -> %lx", __func__, status); \
-		dbgbp;                                                \
+#define cntstatus(status)                                       \
+	if (!NT_SUCCESS(status)) {                                  \
+		prf(red, prefixerror, "%s -> %lx\n", __func__, status); \
+		dbgbp;                                                  \
 	}
 
 #define clstatus(lstatus)                                                         \
 	if (lstatus != ERROR_SUCCESS) {                                               \
 		fm(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, lstatus); \
-		printf(red prefixerror "%s -> %ls" сreset, __func__, pMsgBuffer);         \
+		printf(red prefixerror "%s -> %ls\n" сreset, __func__, pMsgBuffer);       \
 		LocalFree(pMsgBuffer);                                                    \
 		dbgbp;                                                                    \
 	}
 
 #define chandle(handle)                                                       \
-	if (handle == INVALID_HANDLE_VALUE) {                                     \
+	if ((HANDLE)handle == INVALID_HANDLE_VALUE) {                             \
 		error("INVALID_HANDLE_VALUE; GetLastError() = 0x%X", GetLastError()); \
 		dbgbp;                                                                \
 	}
 
 #define cnull(ptr)                                                      \
 	if (ptr == nullptr) {                                               \
+		error("Fail exec func; GetLastError() = 0x%X", GetLastError()); \
+		dbgbp;                                                          \
+	}
+
+#define czero(v)                                                        \
+	if (v == 0) {                                                       \
 		error("Fail exec func; GetLastError() = 0x%X", GetLastError()); \
 		dbgbp;                                                          \
 	}

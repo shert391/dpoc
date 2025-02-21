@@ -3,9 +3,10 @@
 
 void cInit () {
 	cMmShowUnloadedDrivers();
+	/*
 	cMmUnloadedDrivers();
 	dbg("---------- CLEAR ----------");
-	cMmShowUnloadedDrivers();
+	cMmShowUnloadedDrivers();*/
 }
 
 void cDdbCacheTable () {

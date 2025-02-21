@@ -14,17 +14,18 @@ using namespace std::filesystem;
 #include <ntimage.h>
 #endif
 
-#pragma region all
-#include "hde/hde64.h"
-#include "amd64.h"
-#include "ntos.h"
-#include "conf.h"
-#include "dbg.h"
-#include "sig.h"
-#pragma endregion
-
 #ifdef __um__
 #include "ntstatus.h"
 #include "ntdll.h"
 #include "win.h"
 #endif // __um__
+
+#pragma region all
+#include "hde/hde64.h"
+#include "amd64.h"
+#include "ntos.h"
+#include "conf.h"
+#include "file.h"
+#include "dbg.h"
+#include "sig.h"
+#pragma endregion
