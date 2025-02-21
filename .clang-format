@@ -104,7 +104,6 @@ IndentWidth: 4
 
 RemoveEmptyLinesInUnwrappedLines: true
 RemoveParentheses: ReturnStatement
-RemoveBracesLLVM: true
 RemoveSemicolon: true
 
 SortUsingDeclarations: LexicographicNumeric
