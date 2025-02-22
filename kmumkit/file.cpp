@@ -95,6 +95,16 @@ void fFixReloc (IN void* pFile, OUT void* pImage) {
     }
 }
 
+void fInstallTableDynamicFunctions (IN void* pFile, OUT void* pImage) {
+    PIMAGE_NT_HEADERS64 pNtHeaders         = IMAGE_NT_HEADERS64(pFile);
+    uintptr_t           exceptionTableRVA  = pNtHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXCEPTION].VirtualAddress;
+    size_t              exceptionTableSize = pNtHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXCEPTION].Size;
+    void*               exceptionTableVA   = (void*)((uintptr_t)pImage + exceptionTableRVA);
+
+    PRUNTIME_FUNCTION pFirstRuntimeFunction = (PRUNTIME_FUNCTION)exceptionTableVA;
+    RtlAddFunctionTable(pFirstRuntimeFunction, exceptionTableSize / sizeof(_IMAGE_RUNTIME_FUNCTION_ENTRY), (DWORD64)pImage);
+}
+
 void* fExecuteMap (IN const wchar_t* szPath) {
     void* pFile = fFileMap(szPath);
 
@@ -105,7 +115,9 @@ void* fExecuteMap (IN const wchar_t* szPath) {
     fMapSections(pFile, pImage);
     fFixImports(pFile, pImage);
     fFixReloc(pFile, pImage);
+    fInstallTableDynamicFunctions(pFile, pImage);
 
+    void* epVA = (void*)((uintptr_t)pImage + (IMAGE_NT_HEADERS64(pFile))->OptionalHeader.AddressOfEntryPoint);
     czero(VirtualFree(pFile, 0, MEM_RELEASE));
-    return pImage;
+    return epVA;
 }
