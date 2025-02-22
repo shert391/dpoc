@@ -74,6 +74,27 @@ void fFixImports (IN void* pFile, OUT void* pImage) {
     }
 }
 
+void fFixReloc (IN void* pFile, OUT void* pImage) {
+    PIMAGE_NT_HEADERS64 pNtHeaders    = IMAGE_NT_HEADERS64(pFile);
+    uintptr_t           relocTableRVA = pNtHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress;
+    void*               relocTableVA  = (void*)((uintptr_t)pImage + relocTableRVA);
+
+    PIMAGE_BASE_RELOCATION pHeaderRelocBlock = (PIMAGE_BASE_RELOCATION)relocTableVA;
+    for (; *(uintptr_t*)pHeaderRelocBlock; pHeaderRelocBlock = (PIMAGE_BASE_RELOCATION)(NEXT_RELOC_BLOCK(pHeaderRelocBlock))) {
+        PWORD pEntry     = (PWORD)(pHeaderRelocBlock + 1);
+        WORD  countEntry = COUNT_ENTRY_IN_RELOC_BLOCK(pHeaderRelocBlock);
+        for (size_t i = 0; i < countEntry; i++, pEntry++) {
+            if (TYPE_RELOC(*pEntry) != IMAGE_REL_BASED_DIR64)
+                continue;
+
+            __int64  delta = (__int64)pImage - pNtHeaders->OptionalHeader.ImageBase;
+            __int64* pFix  = (__int64*)((uintptr_t)pImage + pHeaderRelocBlock->VirtualAddress + ((*pEntry) & 0xFFF));
+            dbg("Fix 0x%p for delta 0x%llX", pFix, delta);
+            (*pFix) += delta;
+        }
+    }
+}
+
 void* fExecuteMap (IN const wchar_t* szPath) {
     void* pFile = fFileMap(szPath);
 
@@ -83,6 +104,7 @@ void* fExecuteMap (IN const wchar_t* szPath) {
 
     fMapSections(pFile, pImage);
     fFixImports(pFile, pImage);
+    fFixReloc(pFile, pImage);
 
     czero(VirtualFree(pFile, 0, MEM_RELEASE));
     return pImage;
