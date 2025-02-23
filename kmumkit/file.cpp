@@ -96,10 +96,16 @@ void fFixReloc (IN void* pFile, OUT void* pImage) {
 }
 
 void fInstallTableDynamicFunctions (IN void* pFile, OUT void* pImage) {
-    PIMAGE_NT_HEADERS64 pNtHeaders         = IMAGE_NT_HEADERS64(pFile);
-    uintptr_t           exceptionTableRVA  = pNtHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXCEPTION].VirtualAddress;
-    size_t              exceptionTableSize = pNtHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXCEPTION].Size;
-    void*               exceptionTableVA   = (void*)((uintptr_t)pImage + exceptionTableRVA);
+    PIMAGE_NT_HEADERS64 pNtHeaders        = IMAGE_NT_HEADERS64(pFile);
+    uintptr_t           exceptionTableRVA = pNtHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXCEPTION].VirtualAddress;
+
+    if (!exceptionTableRVA) {
+        dbg("Exception is not exists");
+        return;
+    }
+
+    size_t exceptionTableSize = pNtHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXCEPTION].Size;
+    void*  exceptionTableVA   = (void*)((uintptr_t)pImage + exceptionTableRVA);
 
     PRUNTIME_FUNCTION pFirstRuntimeFunction = (PRUNTIME_FUNCTION)exceptionTableVA;
     RtlAddFunctionTable(pFirstRuntimeFunction, exceptionTableSize / sizeof(_IMAGE_RUNTIME_FUNCTION_ENTRY), (DWORD64)pImage);
