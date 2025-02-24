@@ -1,6 +1,12 @@
 ﻿#pragma once
 #pragma region all
+#define INVALID_HANDLE_VALUE (HANDLE)(-1)
+
 void ntUnicodeStringToWchar (IN PUNICODE_STRING pUnicodeString, OUT wchar_t* pOut);
+
+typedef unsigned short WORD;
+typedef WORD*          PWORD;
+typedef unsigned long  DWORD;
 #pragma endregion
 
 #ifdef __um__
@@ -14,6 +20,16 @@ void*     ntGetImageBase (IN const char* szModuleName);
 #define IMPORT extern "C" __declspec(dllimport)
 
 #pragma region undock
+
+typedef struct RUNTIME_FUNCTION {
+    DWORD BeginAddress;
+    DWORD EndAddress;
+
+    union {
+        DWORD UnwindInfoAddress;
+        DWORD UnwindData;
+    };
+} RUNTIME_FUNCTION, *PRUNTIME_FUNCTION;
 
 typedef struct _RTL_PROCESS_MODULE_INFORMATION {
     HANDLE Section; // Not filled in
@@ -145,4 +161,14 @@ IMPORT NTSTATUS NTAPI ZwQuerySystemInformation (
 void  ntGetMmUnloadedDrivers (OUT void** ppMmUnloadedDrivers, OUT int** ppMmLastUnloadedDriver);
 void  ntGetPiDdbCache (OUT PERESOURCE* ppLock, OUT PRTL_AVL_TABLE* ppDdbCache);
 void* ntGetImageBase (IN const char* szModuleName);
+
+HANDLE ntOpenFile (IN const wchar_t* szPath, IN ACCESS_MASK desiredAccess, IN ULONG shareAccess, IN ULONG openOptions);
+void   ntReadFile (IN HANDLE hFile, OUT void* pOut, IN size_t size);
+size_t ntGetFileSize (IN HANDLE hFile);
+
+void  ntMmSetPageProtection (IN void* pMem, IN size_t size, IN int newProtect);
+void  ntMmFreeIndependentPages (IN void* pMem, IN size_t size);
+void* ntMmAllocateIndependentPagesEx (IN size_t size);
+
+__int64 ntRtlpInsertInvertedFunctionTableEntry (IN void* pImageBase, IN PRUNTIME_FUNCTION pFunctionTable, IN int sizeImage, IN int sizeFunctionTable);
 #endif // __km__

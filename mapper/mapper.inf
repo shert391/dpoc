@@ -1,0 +1,62 @@
+;
+; mapper.inf
+;
+
+[Version]
+Signature   = "$WINDOWS NT$"
+Class       = System ; TODO: specify appropriate Class
+ClassGuid   = {4d36e97d-e325-11ce-bfc1-08002be10318} ; TODO: specify appropriate ClassGuid
+Provider    = %ManufacturerName%
+CatalogFile = mapper.cat
+DriverVer   = ; TODO: set DriverVer in stampinf property pages
+PnpLockdown = 1
+
+[DestinationDirs]
+DefaultDestDir = 13
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+mapper.sys = 1,,
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%ManufacturerName% = Standard,NT$ARCH$.10.0...16299 ; %13% support introduced in build 16299
+
+[Standard.NT$ARCH$.10.0...16299]
+%mapper.DeviceDesc% = mapper_Device, Root\mapper ; TODO: edit hw-id
+
+[mapper_Device.NT]
+CopyFiles = File_Copy
+
+[File_Copy]
+mapper.sys
+
+;-------------- Service installation
+[mapper_Device.NT.Services]
+AddService = mapper,%SPSVCINST_ASSOCSERVICE%, mapper_Service_Inst
+
+; -------------- mapper driver install sections
+[mapper_Service_Inst]
+DisplayName    = %mapper.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %13%\mapper.sys
+
+[mapper_Device.NT.Wdf]
+KmdfService = mapper, mapper_wdfsect
+
+[mapper_wdfsect]
+KmdfLibraryVersion = $KMDFVERSION$
+
+[Strings]
+SPSVCINST_ASSOCSERVICE = 0x00000002
+ManufacturerName = "<Your manufacturer name>" ;TODO: Replace with your manufacturer name
+DiskName = "mapper Installation Disk"
+mapper.DeviceDesc = "mapper Device"
+mapper.SVCDESC = "mapper Service"

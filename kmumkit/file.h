@@ -6,5 +6,5 @@
 #define NEXT_RELOC_BLOCK(block)           (void*)((char*)block + block->SizeOfBlock)
 #define COUNT_ENTRY_IN_RELOC_BLOCK(block) (block->SizeOfBlock - 8) / 2
 
-void* fFileMap (IN const wchar_t* szPath);
 void* fExecuteMap (IN const wchar_t* szPath);
+void* fFileMap (IN const wchar_t* szPath, OUT OPTIONAL size_t* pSize = nullptr);

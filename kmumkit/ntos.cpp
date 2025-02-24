@@ -69,6 +69,11 @@ uintptr_t ntGetRvaCiOptions (IN void* pImageBaseKrnl) {
 #endif // __um__
 
 #ifdef __km__
+void* (*gMmFreeIndependentPages)(IN void* pMem, IN size_t size);
+void* (*gMmSetPageProtection)(IN void* pMem, IN size_t numberOfBytes, IN int newProtect);
+void* (*gMmAllocateIndependentPagesEx)(IN size_t size, IN int numaNodeNumber, IN OPTIONAL void* pUnkown, IN OPTIONAL int unkown);
+__int64 (*gRtlpInsertInvertedFunctionTableEntry)(OPTIONAL __int64 reversed, IN void* pImageBase, IN PRUNTIME_FUNCTION pFunctionTable, IN int sizeImage, IN int sizeFunctionTable);
+
 void* ntGetImageBase (IN const char* szModuleName) {
     void* ret = nullptr;
 
@@ -121,5 +126,58 @@ void ntGetPiDdbCache (OUT PERESOURCE* ppLock, OUT PRTL_AVL_TABLE* ppDdbCache) {
     auto disLock = disasm(pDdbLockInstr);
     *ppLock      = (PERESOURCE)((uintptr_t)disLock.pNextInstr + disLock.disp.disp32);
     dbg("pDdbLock = 0x%p", *ppLock);
+}
+
+HANDLE ntOpenFile (IN const wchar_t* szPath, IN ACCESS_MASK desiredAccess, IN ULONG shareAccess, IN ULONG openOptions) {
+    UNICODE_STRING pathUnicode {0};
+    RtlInitUnicodeString(&pathUnicode, szPath);
+
+    OBJECT_ATTRIBUTES objectAttributes {0};
+    InitializeObjectAttributes(&objectAttributes, &pathUnicode, OBJ_KERNEL_HANDLE, nullptr, nullptr);
+
+    HANDLE          hResult;
+    IO_STATUS_BLOCK ioStatus {0};
+    cntstatus(ZwOpenFile(&hResult, desiredAccess, &objectAttributes, &ioStatus, shareAccess, openOptions));
+    return hResult;
+}
+
+void ntReadFile (IN HANDLE hFile, OUT void* pOut, IN size_t size) {
+    IO_STATUS_BLOCK ioStatus {0};
+    cntstatus(ZwReadFile(hFile, nullptr, nullptr, nullptr, &ioStatus, pOut, size, nullptr, nullptr));
+}
+
+size_t ntGetFileSize (IN HANDLE hFile) {
+    FILE_STANDARD_INFORMATION result {0};
+    IO_STATUS_BLOCK           ioStatus {0};
+    cntstatus(ZwQueryInformationFile(hFile, &ioStatus, &result, sizeof(FILE_STANDARD_INFORMATION), FileStandardInformation));
+    return result.EndOfFile.QuadPart;
+}
+
+void* ntGetNtosBase () {
+    return ntGetImageBase("ntoskrnl.exe");
+}
+
+void* ntMmAllocateIndependentPagesEx (IN size_t size) {
+    if (!gMmAllocateIndependentPagesEx)
+        gMmAllocateIndependentPagesEx = (decltype(gMmAllocateIndependentPagesEx))scanInSection(ntGetNtosBase(), "PAGE", SIG_MM_ALLOCATE_INDEPENDENT_PAGE_EX, sizeof(SIG_MM_ALLOCATE_INDEPENDENT_PAGE_EX));
+    return gMmAllocateIndependentPagesEx(size, -1, nullptr, 0);
+}
+
+void ntMmFreeIndependentPages (IN void* pMem, IN size_t size) {
+    if (!gMmFreeIndependentPages)
+        gMmFreeIndependentPages = (decltype(gMmFreeIndependentPages))scanInSection(ntGetNtosBase(), "PAGE", SIG_MM_FREE_INDEPENDENT_PAGES, sizeof(SIG_MM_FREE_INDEPENDENT_PAGES));
+    gMmFreeIndependentPages(pMem, size);
+}
+
+void ntMmSetPageProtection (IN void* pMem, IN size_t size, IN int newProtect) {
+    if (!gMmSetPageProtection)
+        gMmSetPageProtection = (decltype(gMmSetPageProtection))scanInSection(ntGetNtosBase(), ".text", SIG_MM_SET_PAGE_PROTECTION, sizeof(SIG_MM_SET_PAGE_PROTECTION));
+    gMmSetPageProtection(pMem, size, newProtect);
+}
+
+__int64 ntRtlpInsertInvertedFunctionTableEntry (IN void* pImageBase, IN PRUNTIME_FUNCTION pFunctionTable, IN int sizeImage, IN int sizeFunctionTable) {
+    if (!gRtlpInsertInvertedFunctionTableEntry)
+        gRtlpInsertInvertedFunctionTableEntry = (decltype(gRtlpInsertInvertedFunctionTableEntry))scanInSection(ntGetNtosBase(), ".text", SIG_RTLP_INSERT_INVERTED_FUNCTION_TABLE_ENTRY, sizeof(SIG_RTLP_INSERT_INVERTED_FUNCTION_TABLE_ENTRY));
+    return gRtlpInsertInvertedFunctionTableEntry(0, pImageBase, pFunctionTable, sizeImage, sizeFunctionTable);
 }
 #endif // __km__

@@ -1,7 +1,7 @@
 ﻿#include "global.h"
 
-void* fFileMap (IN const wchar_t* szPath) {
 #ifdef __um__
+void* fFileMap (IN const wchar_t* szPath, OUT OPTIONAL size_t* pSize) {
     OFSTRUCT fInfo {0};
     HANDLE   hFile = CreateFile(szPath, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
     chandle(hFile);
@@ -17,11 +17,32 @@ void* fFileMap (IN const wchar_t* szPath) {
     CloseHandle(hFile);
 
     dbg("pRawImage = 0x%p; szPath = %ls; rawSize = %lli bytes; File mapped success!", pMapPages, szPath, exInt.QuadPart);
-    return pMapPages;
-#endif // __um__
 
-    return nullptr;
+    if (pSize)
+        *pSize = exInt.QuadPart;
+
+    return pMapPages;
 }
+#endif // __um__
+#ifdef __km__
+void* fFileMap (IN const wchar_t* szPath, OUT OPTIONAL size_t* pSize) {
+    HANDLE hFile    = ntOpenFile(szPath, GENERIC_READ, 0, FILE_SYNCHRONOUS_IO_NONALERT);
+    size_t sizeFile = ntGetFileSize(hFile);
+
+    void* pMapPages = ntMmAllocateIndependentPagesEx(sizeFile);
+    cnull(pMapPages);
+
+    ntReadFile(hFile, pMapPages, sizeFile);
+    ZwClose(hFile);
+
+    dbg("pRawImage = 0x%p; szPath = %ls; rawSize = %lli bytes; File mapped success!", pMapPages, szPath, sizeFile);
+
+    if (pSize)
+        *pSize = sizeFile;
+
+    return pMapPages;
+}
+#endif // __km__
 
 void fMapSections (IN void* pFile, OUT void* pImage) {
     PIMAGE_NT_HEADERS64   pNtHeaders     = IMAGE_NT_HEADERS64(pFile);
@@ -45,9 +66,12 @@ void fFixImports (IN void* pFile, OUT void* pImage) {
 
     PIMAGE_IMPORT_DESCRIPTOR pDescriptor = (PIMAGE_IMPORT_DESCRIPTOR)importTableVA;
     for (; *(uintptr_t*)pDescriptor; pDescriptor++) {
-        char*   szNameLib = (char*)((uintptr_t)pImage + pDescriptor->Name);
-        HMODULE hLib      = LoadLibraryA(szNameLib);
+        char* szNameLib = (char*)((uintptr_t)pImage + pDescriptor->Name);
+
+#ifdef __um__
+        HMODULE hLib = LoadLibraryA(szNameLib);
         chandle(hLib);
+#endif // __um__
 
         void* pIAT = (void*)((uintptr_t)pImage + pDescriptor->FirstThunk);
         void* pOTs = (void*)((uintptr_t)pImage + pDescriptor->OriginalFirstThunk);
@@ -58,7 +82,13 @@ void fFixImports (IN void* pFile, OUT void* pImage) {
 
         for (; *(uintptr_t*)pThunk; pThunk++, ppFunction++) {
             if (IMAGE_SNAP_BY_ORDINAL(*(uintptr_t*)pThunk)) {
+#ifdef __um__
                 void* pFunc = GetProcAddress(hLib, (char*)IMAGE_ORDINAL(pThunk->u1.Ordinal));
+#endif // __um__
+#ifdef __km__
+                void* pFunc = MmGetSystemRoutineAddress((PUNICODE_STRING)IMAGE_ORDINAL(pThunk->u1.Ordinal));
+#endif // __km__
+
                 cnull(pFunc);
                 *ppFunction = pFunc;
                 dbg("Fix import by ordinal %llX", IMAGE_ORDINAL(pThunk->u1.Ordinal));
@@ -66,7 +96,20 @@ void fFixImports (IN void* pFile, OUT void* pImage) {
             }
 
             PIMAGE_IMPORT_BY_NAME pInfoImportByName = (PIMAGE_IMPORT_BY_NAME)((uintptr_t)pImage + pThunk->u1.AddressOfData);
-            void*                 pFunc             = GetProcAddress(hLib, pInfoImportByName->Name);
+
+#ifdef __um__
+            void* pFunc = GetProcAddress(hLib, pInfoImportByName->Name);
+#endif // __um__
+#ifdef __km__
+            STRING asciiString {0};
+            RtlInitAnsiString(&asciiString, pInfoImportByName->Name);
+
+            UNICODE_STRING unicodeString {0};
+            RtlAnsiStringToUnicodeString(&unicodeString, &asciiString, true);
+
+            void* pFunc = MmGetSystemRoutineAddress(&unicodeString);
+#endif // __km__
+
             cnull(pFunc);
             *ppFunction = pFunc;
             dbg("Fix import by name %s", pInfoImportByName->Name);
@@ -95,7 +138,7 @@ void fFixReloc (IN void* pFile, OUT void* pImage) {
     }
 }
 
-void fInstallTableDynamicFunctions (IN void* pFile, OUT void* pImage) {
+void fInstallTableDynamicFunctions (IN void* pFile, OUT void* pImage, IN OPTIONAL size_t sizeImage = 0) {
     PIMAGE_NT_HEADERS64 pNtHeaders        = IMAGE_NT_HEADERS64(pFile);
     uintptr_t           exceptionTableRVA = pNtHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXCEPTION].VirtualAddress;
 
@@ -108,22 +151,43 @@ void fInstallTableDynamicFunctions (IN void* pFile, OUT void* pImage) {
     void*  exceptionTableVA   = (void*)((uintptr_t)pImage + exceptionTableRVA);
 
     PRUNTIME_FUNCTION pFirstRuntimeFunction = (PRUNTIME_FUNCTION)exceptionTableVA;
+
+#ifdef __um__
     RtlAddFunctionTable(pFirstRuntimeFunction, exceptionTableSize / sizeof(_IMAGE_RUNTIME_FUNCTION_ENTRY), (DWORD64)pImage);
+#endif // __um__
+#ifdef __km__
+    ntRtlpInsertInvertedFunctionTableEntry(pImage, pFirstRuntimeFunction, sizeImage, exceptionTableSize);
+#endif
 }
 
 void* fExecuteMap (IN const wchar_t* szPath) {
-    void* pFile = fFileMap(szPath);
+    size_t sizeFile {0};
+    void*  pFile = fFileMap(szPath, &sizeFile);
 
     size_t sizeImage = (IMAGE_NT_HEADERS64(pFile))->OptionalHeader.SizeOfImage;
-    void*  pImage    = VirtualAlloc(nullptr, sizeImage, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+
+#ifdef __um__
+    void* pImage = VirtualAlloc(nullptr, sizeImage, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
     cnull(pImage);
+#endif // __um__
+#ifdef __km__
+    void* pImage = ntMmAllocateIndependentPagesEx(sizeImage);
+    ntMmSetPageProtection(pImage, sizeImage, PAGE_EXECUTE_READWRITE);
+#endif // __km__
 
     fMapSections(pFile, pImage);
     fFixImports(pFile, pImage);
     fFixReloc(pFile, pImage);
-    fInstallTableDynamicFunctions(pFile, pImage);
+    fInstallTableDynamicFunctions(pFile, pImage, sizeImage);
 
     void* epVA = (void*)((uintptr_t)pImage + (IMAGE_NT_HEADERS64(pFile))->OptionalHeader.AddressOfEntryPoint);
+
+#ifdef __um__
     czero(VirtualFree(pFile, 0, MEM_RELEASE));
+#endif // __um__
+#ifdef __km__
+    ntMmFreeIndependentPages(pFile, sizeFile);
+#endif // __km__
+
     return epVA;
 }

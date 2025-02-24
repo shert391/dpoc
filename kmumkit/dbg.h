@@ -12,6 +12,21 @@
 #pragma endregion
 
 #ifdef __km__
+#define erprint(msg, ...) \
+    DbgPrintEx(DPFLTR_IHVDRIVER_ID, DPFLTR_ERROR_LEVEL, prefixdbg "%s " msg, __func__, __VA_ARGS__);
+
+#define chandle(handle)                                                                                 \
+    {                                                                                                   \
+        if ((HANDLE)handle == INVALID_HANDLE_VALUE) {                                                   \
+            DbgPrintEx(DPFLTR_IHVDRIVER_ID, DPFLTR_ERROR_LEVEL, prefixdbg "%s Bad handle\n", __func__); \
+            dbgbp                                                                                       \
+        }                                                                                               \
+    }
+#define cntstatus(status)                        \
+    if (!NT_SUCCESS(status)) {                   \
+        erprint("Bad NTSTATUS = 0x%X\n", status) \
+            dbgbp;                               \
+    }
 #define cnull(p) \
     if (!p) {    \
         dbgbp    \
