@@ -2,8 +2,6 @@
 #pragma region all
 #define INVALID_HANDLE_VALUE (HANDLE)(-1)
 
-void ntUnicodeStringToWchar (IN PUNICODE_STRING pUnicodeString, OUT wchar_t* pOut);
-
 typedef unsigned short WORD;
 typedef WORD*          PWORD;
 typedef unsigned long  DWORD;
@@ -17,6 +15,8 @@ void*     ntGetImageBase (IN const char* szModuleName);
 #endif // __um__
 
 #ifdef __km__
+void ntUnicodeStringToWchar (IN PUNICODE_STRING pUnicodeString, OUT wchar_t* pOut);
+
 #define IMPORT extern "C" __declspec(dllimport)
 
 #pragma region undock
@@ -161,6 +161,9 @@ IMPORT NTSTATUS NTAPI ZwQuerySystemInformation (
 void  ntGetMmUnloadedDrivers (OUT void** ppMmUnloadedDrivers, OUT int** ppMmLastUnloadedDriver);
 void  ntGetPiDdbCache (OUT PERESOURCE* ppLock, OUT PRTL_AVL_TABLE* ppDdbCache);
 void* ntGetImageBase (IN const char* szModuleName);
+
+char*     ntPsGetProcessImageFileName (IN PEPROCESS pProc);
+PEPROCESS ntFindProccessByName (IN const char* szProccessName);
 
 HANDLE ntOpenFile (IN const wchar_t* szPath, IN ACCESS_MASK desiredAccess, IN ULONG shareAccess, IN ULONG openOptions);
 void   ntReadFile (IN HANDLE hFile, OUT void* pOut, IN size_t size);

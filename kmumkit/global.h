@@ -10,6 +10,7 @@ using namespace std::filesystem;
 #endif
 
 #ifdef __km__
+#include <ntifs.h>
 #include <ntddk.h>
 #include <ntimage.h>
 #endif
@@ -25,6 +26,7 @@ using namespace std::filesystem;
 #include "amd64.h"
 #include "ntos.h"
 #include "conf.h"
+#include "hook.h"
 #include "file.h"
 #include "dbg.h"
 #include "sig.h"

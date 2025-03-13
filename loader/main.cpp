@@ -1,7 +1,13 @@
 ﻿#include "global.h"
 
+__int64(NTAPI* NtUserGetPointerDeviceOrientation)(__int64 unused1, LPCWSTR pText);
+
 int main () {
     setlocale(LC_ALL, "Russian");
-    wchar_t unsigned char code[] = {0x8B, 0x05, 0x7D, 0x87, 0xFE, 0xFF};
-    ntiomsi().drvload(path(L"C:\\Users\\User\\source\\repos\\drv\\x64\\Debug\\drv.sys"));
+
+    LoadLibrary(L"user32.dll");
+    HMODULE hModule                   = LoadLibrary(L"win32u.dll");
+    NtUserGetPointerDeviceOrientation = (decltype(NtUserGetPointerDeviceOrientation))GetProcAddress(hModule, "NtUserGetPointerDeviceOrientation");
+
+    NtUserGetPointerDeviceOrientation(0, L"Communication Hook Test");
 }

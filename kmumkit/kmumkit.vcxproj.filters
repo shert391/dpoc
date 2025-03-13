@@ -36,6 +36,9 @@
     <ClCompile Include="file.cpp">
       <Filter>ex</Filter>
     </ClCompile>
+    <ClCompile Include="hook.cpp">
+      <Filter>ex</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="drv.h">
@@ -77,6 +80,9 @@
       <Filter>hde</Filter>
     </ClInclude>
     <ClInclude Include="file.h">
+      <Filter>ex</Filter>
+    </ClInclude>
+    <ClInclude Include="hook.h">
       <Filter>ex</Filter>
     </ClInclude>
   </ItemGroup>

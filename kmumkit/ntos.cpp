@@ -69,6 +69,7 @@ uintptr_t ntGetRvaCiOptions (IN void* pImageBaseKrnl) {
 #endif // __um__
 
 #ifdef __km__
+PEPROCESS (*gPsGetNextProcess)(IN PEPROCESS pCurrentProccess);
 void* (*gMmFreeIndependentPages)(IN void* pMem, IN size_t size);
 void* (*gMmSetPageProtection)(IN void* pMem, IN size_t numberOfBytes, IN int newProtect);
 void* (*gMmAllocateIndependentPagesEx)(IN size_t size, IN int numaNodeNumber, IN OPTIONAL void* pUnkown, IN OPTIONAL int unkown);
@@ -96,6 +97,40 @@ void* ntGetImageBase (IN const char* szModuleName) {
 
     ExFreePoolWithTag(pProcessModules, 'drP');
     return ret;
+}
+
+void* ntGetNtosBase () {
+    return ntGetImageBase("ntoskrnl.exe");
+}
+
+void* ntMmAllocateIndependentPagesEx (IN size_t size) {
+    if (!gMmAllocateIndependentPagesEx)
+        gMmAllocateIndependentPagesEx = (decltype(gMmAllocateIndependentPagesEx))scanInSection(ntGetNtosBase(), "PAGE", SIG_MM_ALLOCATE_INDEPENDENT_PAGE_EX, sizeof(SIG_MM_ALLOCATE_INDEPENDENT_PAGE_EX));
+    return gMmAllocateIndependentPagesEx(size, -1, nullptr, 0);
+}
+
+void ntMmFreeIndependentPages (IN void* pMem, IN size_t size) {
+    if (!gMmFreeIndependentPages)
+        gMmFreeIndependentPages = (decltype(gMmFreeIndependentPages))scanInSection(ntGetNtosBase(), "PAGE", SIG_MM_FREE_INDEPENDENT_PAGES, sizeof(SIG_MM_FREE_INDEPENDENT_PAGES));
+    gMmFreeIndependentPages(pMem, size);
+}
+
+void ntMmSetPageProtection (IN void* pMem, IN size_t size, IN int newProtect) {
+    if (!gMmSetPageProtection)
+        gMmSetPageProtection = (decltype(gMmSetPageProtection))scanInSection(ntGetNtosBase(), ".text", SIG_MM_SET_PAGE_PROTECTION, sizeof(SIG_MM_SET_PAGE_PROTECTION));
+    gMmSetPageProtection(pMem, size, newProtect);
+}
+
+__int64 ntRtlpInsertInvertedFunctionTableEntry (IN void* pImageBase, IN PRUNTIME_FUNCTION pFunctionTable, IN int sizeImage, IN int sizeFunctionTable) {
+    if (!gRtlpInsertInvertedFunctionTableEntry)
+        gRtlpInsertInvertedFunctionTableEntry = (decltype(gRtlpInsertInvertedFunctionTableEntry))scanInSection(ntGetNtosBase(), ".text", SIG_RTLP_INSERT_INVERTED_FUNCTION_TABLE_ENTRY, sizeof(SIG_RTLP_INSERT_INVERTED_FUNCTION_TABLE_ENTRY));
+    return gRtlpInsertInvertedFunctionTableEntry(0, pImageBase, pFunctionTable, sizeImage, sizeFunctionTable);
+}
+
+PEPROCESS ntPsGetNextProcess (IN PEPROCESS pCurrentProcess) {
+    if (!gPsGetNextProcess)
+        gPsGetNextProcess = (decltype(gPsGetNextProcess))scanInSection(ntGetNtosBase(), "PAGE", SIG_PS_GET_NEXT_PROCESS, sizeof(SIG_PS_GET_NEXT_PROCESS));
+    return gPsGetNextProcess(pCurrentProcess);
 }
 
 void ntGetMmUnloadedDrivers (OUT void** ppMmUnloadedDrivers, OUT int** pMmLastUnloadedDriver) {
@@ -153,31 +188,25 @@ size_t ntGetFileSize (IN HANDLE hFile) {
     return result.EndOfFile.QuadPart;
 }
 
-void* ntGetNtosBase () {
-    return ntGetImageBase("ntoskrnl.exe");
+char* ntPsGetProcessImageFileName (IN PEPROCESS pProc) {
+    return (char*)pProc + 0x5A8;
 }
 
-void* ntMmAllocateIndependentPagesEx (IN size_t size) {
-    if (!gMmAllocateIndependentPagesEx)
-        gMmAllocateIndependentPagesEx = (decltype(gMmAllocateIndependentPagesEx))scanInSection(ntGetNtosBase(), "PAGE", SIG_MM_ALLOCATE_INDEPENDENT_PAGE_EX, sizeof(SIG_MM_ALLOCATE_INDEPENDENT_PAGE_EX));
-    return gMmAllocateIndependentPagesEx(size, -1, nullptr, 0);
-}
+PEPROCESS ntFindProccessByName (IN const char* szProccessName) {
+    PEPROCESS pCurrentProcess {0};
+    pCurrentProcess = ntPsGetNextProcess(pCurrentProcess);
 
-void ntMmFreeIndependentPages (IN void* pMem, IN size_t size) {
-    if (!gMmFreeIndependentPages)
-        gMmFreeIndependentPages = (decltype(gMmFreeIndependentPages))scanInSection(ntGetNtosBase(), "PAGE", SIG_MM_FREE_INDEPENDENT_PAGES, sizeof(SIG_MM_FREE_INDEPENDENT_PAGES));
-    gMmFreeIndependentPages(pMem, size);
-}
+    while (pCurrentProcess) {
+        char* szCurProcName = ntPsGetProcessImageFileName(pCurrentProcess);
 
-void ntMmSetPageProtection (IN void* pMem, IN size_t size, IN int newProtect) {
-    if (!gMmSetPageProtection)
-        gMmSetPageProtection = (decltype(gMmSetPageProtection))scanInSection(ntGetNtosBase(), ".text", SIG_MM_SET_PAGE_PROTECTION, sizeof(SIG_MM_SET_PAGE_PROTECTION));
-    gMmSetPageProtection(pMem, size, newProtect);
-}
+        if (strlen(szCurProcName) > 0 && strcmp(szCurProcName, szProccessName) == 0)
+            return pCurrentProcess;
 
-__int64 ntRtlpInsertInvertedFunctionTableEntry (IN void* pImageBase, IN PRUNTIME_FUNCTION pFunctionTable, IN int sizeImage, IN int sizeFunctionTable) {
-    if (!gRtlpInsertInvertedFunctionTableEntry)
-        gRtlpInsertInvertedFunctionTableEntry = (decltype(gRtlpInsertInvertedFunctionTableEntry))scanInSection(ntGetNtosBase(), ".text", SIG_RTLP_INSERT_INVERTED_FUNCTION_TABLE_ENTRY, sizeof(SIG_RTLP_INSERT_INVERTED_FUNCTION_TABLE_ENTRY));
-    return gRtlpInsertInvertedFunctionTableEntry(0, pImageBase, pFunctionTable, sizeImage, sizeFunctionTable);
+        PEPROCESS pNextProcess = ntPsGetNextProcess(pCurrentProcess);
+        ObfDereferenceObject(pCurrentProcess);
+        pCurrentProcess = pNextProcess;
+    }
+
+    return nullptr;
 }
 #endif // __km__

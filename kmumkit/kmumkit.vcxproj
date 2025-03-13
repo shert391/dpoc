@@ -71,6 +71,7 @@
     <ClCompile Include="drv.cpp" />
     <ClCompile Include="file.cpp" />
     <ClCompile Include="hde\hde64.c" />
+    <ClCompile Include="hook.cpp" />
     <ClCompile Include="ntos.cpp" />
     <ClCompile Include="sig.cpp" />
     <ClCompile Include="win.cpp" />
@@ -85,6 +86,7 @@
     <ClInclude Include="hde\hde64.h" />
     <ClInclude Include="hde\pstdint.h" />
     <ClInclude Include="hde\table64.h" />
+    <ClInclude Include="hook.h" />
     <ClInclude Include="ntdll.h" />
     <ClInclude Include="ntos.h" />
     <ClInclude Include="ntstatus.h" />
