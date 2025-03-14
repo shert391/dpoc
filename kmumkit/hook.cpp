@@ -39,10 +39,6 @@ void hAbsolute (IN void* pTarget, IN void* pDst, OUT void** ppOriginalStub, IN v
     *ppOriginalStub = pSectionPit;
 }
 
-void hGetFreePit (const wchar_t* szSectionName) {
-    ntGetImageBase("");
-}
-
 void hRestoreWrite (IN void* pTarget, IN size_t size) {
     DWORD oldProtect;
 

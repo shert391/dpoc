@@ -199,12 +199,13 @@ PEPROCESS ntFindProccessByName (IN const char* szProccessName) {
     while (pCurrentProcess) {
         char* szCurProcName = ntPsGetProcessImageFileName(pCurrentProcess);
 
-        if (strlen(szCurProcName) > 0 && strcmp(szCurProcName, szProccessName) == 0)
+        if (strlen(szCurProcName) > 0 && strcmp(szCurProcName, szProccessName) == 0) {
+            ObfDereferenceObject(pCurrentProcess);
             return pCurrentProcess;
+        }
 
         PEPROCESS pNextProcess = ntPsGetNextProcess(pCurrentProcess);
-        ObfDereferenceObject(pCurrentProcess);
-        pCurrentProcess = pNextProcess;
+        pCurrentProcess        = pNextProcess;
     }
 
     return nullptr;
