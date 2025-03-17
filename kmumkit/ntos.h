@@ -151,6 +151,40 @@ typedef enum _SYSTEM_INFORMATION_CLASS {
 
 } SYSTEM_INFORMATION_CLASS;
 
+struct _KINTERRUPT {
+    __int16     Type;
+    __int16     Size;
+    _LIST_ENTRY InterruptListEntry;
+    unsigned __int8(__fastcall* ServiceRoutine)(_KINTERRUPT*, void*);
+    unsigned __int8(__fastcall* MessageServiceRoutine)(_KINTERRUPT*, void*, unsigned int);
+    unsigned int      MessageIndex;
+    void*             ServiceContext;
+    unsigned __int64  SpinLock;
+    unsigned int      TickCount;
+    unsigned __int64* ActualLock;
+    void(__fastcall* DispatchAddress)();
+    unsigned int         Vector;
+    unsigned __int8      Irql;
+    unsigned __int8      SynchronizeIrql;
+    unsigned __int8      FloatingSave;
+    unsigned __int8      Connected;
+    unsigned int         Number;
+    unsigned __int8      ShareVector;
+    unsigned __int8      EmulateActiveBoth;
+    unsigned __int16     ActiveCount;
+    int                  InternalState;
+    _KINTERRUPT_MODE     Mode;
+    _KINTERRUPT_POLARITY Polarity;
+    unsigned int         ServiceCount;
+    unsigned int         DispatchCount;
+    _KEVENT*             PassiveEvent;
+    _KTRAP_FRAME*        TrapFrame;
+    void*                DisconnectData;
+    _KTHREAD* volatile ServiceThread;
+    void* ConnectionData;
+    void* IntTrackEntry;
+};
+
 IMPORT NTSTATUS NTAPI ZwQuerySystemInformation (
     IN SYSTEM_INFORMATION_CLASS systemInformationClass,
     OUT PVOID                   systemInformation,
@@ -169,9 +203,18 @@ HANDLE ntOpenFile (IN const wchar_t* szPath, IN ACCESS_MASK desiredAccess, IN UL
 void   ntReadFile (IN HANDLE hFile, OUT void* pOut, IN size_t size);
 size_t ntGetFileSize (IN HANDLE hFile);
 
+void* ntGetPrcb (IN int processorsNumber);
+PKPCR ntGetPrc (IN int processorsNumber);
+
 void  ntMmSetPageProtection (IN void* pMem, IN size_t size, IN int newProtect);
 void  ntMmFreeIndependentPages (IN void* pMem, IN size_t size);
 void* ntMmAllocateIndependentPagesEx (IN size_t size);
 
-__int64 ntRtlpInsertInvertedFunctionTableEntry (IN void* pImageBase, IN PRUNTIME_FUNCTION pFunctionTable, IN int sizeImage, IN int sizeFunctionTable);
+KIRQL ntDisableCr0WP ();
+void  ntEnableCr0WP (KIRQL oldIrql);
+void  ntDisableCr4SMAP ();
+void  ntEnableCr4SMAP ();
+
+__int64  ntRtlpInsertInvertedFunctionTableEntry (IN void* pImageBase, IN PRUNTIME_FUNCTION pFunctionTable, IN int sizeImage, IN int sizeFunctionTable);
+NTSTATUS ntIoConnectInterruptNoACPI (_Out_ PKINTERRUPT* InterruptObject, _In_ PKSERVICE_ROUTINE ServiceRoutine, _In_opt_ PVOID ServiceContext, _In_opt_ PKSPIN_LOCK SpinLock, _In_ ULONG Vector, _In_ KIRQL Irql, _In_ KIRQL SynchronizeIrql, _In_ KINTERRUPT_MODE InterruptMode, _In_ BOOLEAN ShareVector, _In_ KAFFINITY ProcessorEnableMask, _In_ BOOLEAN FloatingSave);
 #endif // __km__

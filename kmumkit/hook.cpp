@@ -39,6 +39,18 @@ void hAbsolute (IN void* pTarget, IN void* pDst, OUT void** ppOriginalStub, IN v
     *ppOriginalStub = pSectionPit;
 }
 
+void hMemset (IN void* pDst, IN char val, IN size_t size) {
+    KIRQL oldIrql = ntDisableCr0WP();
+    memset(pDst, val, size);
+    ntEnableCr0WP(oldIrql);
+}
+
+void hMemcpy (IN void* pDst, IN void* pSrc, IN size_t size) {
+    KIRQL oldIrql = ntDisableCr0WP();
+    memcpy(pDst, pSrc, size);
+    ntEnableCr0WP(oldIrql);
+}
+
 void hRestoreWrite (IN void* pTarget, IN size_t size) {
     DWORD oldProtect;
 

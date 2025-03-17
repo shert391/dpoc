@@ -1,5 +1,7 @@
 ﻿#include "global.h"
 
+#define ENABLE_AMD64_SHADOW_STACK
+
 #pragma region all
 
 void ntUnicodeStringToWchar (IN PUNICODE_STRING pUnicodeString, OUT wchar_t* pOut) {
@@ -69,11 +71,13 @@ uintptr_t ntGetRvaCiOptions (IN void* pImageBaseKrnl) {
 #endif // __um__
 
 #ifdef __km__
+void* (*gKeGetPrcb)(IN int processorsNumber);
 PEPROCESS (*gPsGetNextProcess)(IN PEPROCESS pCurrentProccess);
 void* (*gMmFreeIndependentPages)(IN void* pMem, IN size_t size);
 void* (*gMmSetPageProtection)(IN void* pMem, IN size_t numberOfBytes, IN int newProtect);
 void* (*gMmAllocateIndependentPagesEx)(IN size_t size, IN int numaNodeNumber, IN OPTIONAL void* pUnkown, IN OPTIONAL int unkown);
 __int64 (*gRtlpInsertInvertedFunctionTableEntry)(OPTIONAL __int64 reversed, IN void* pImageBase, IN PRUNTIME_FUNCTION pFunctionTable, IN int sizeImage, IN int sizeFunctionTable);
+__int64 (*gIopConnectInterruptFullySpecified)(PKINTERRUPT pKinterrupt, ULONG_PTR zero, PKSERVICE_ROUTINE pServiceRoutine, void* pServiceContext, PKSPIN_LOCK pSpinLock, DWORD vector, KIRQL irql, KIRQL synchronizeIrql, KINTERRUPT_MODE interruptMode, bool isShareVector, void* pProcessorEnableMask);
 
 void* ntGetImageBase (IN const char* szModuleName) {
     void* ret = nullptr;
@@ -115,10 +119,65 @@ void ntMmFreeIndependentPages (IN void* pMem, IN size_t size) {
     gMmFreeIndependentPages(pMem, size);
 }
 
+KIRQL ntDisableCr0WP () {
+    // Если процессор поддерживает технологию защиты потока управления на основе теневых стэков, то необходимо отключить её - сброс CR4.CTE(23 бит).
+    // Т.к. сброс CR0.WP при включенном CR4.CTE приводит к #GP
+#ifdef ENABLE_AMD64_SHADOW_STACK
+    UINT64 cr4 = __readcr4();
+    __writecr4(cr4 & ~0x800000);
+#endif                                    // ENABLE_SHADOW_STACK
+
+    KIRQL oldIrql {0};
+    oldIrql    = KeRaiseIrqlToDpcLevel(); // Повышаем IRQL до DPC, чтобы отключить планировщик потоков для текущего ядра(планировщик работает на DPC IRQL)
+    UINT64 cr0 = __readcr0();
+    __writecr0(cr0 & ~0x10000);           // Обнуляем 16-бит CR0.WP
+
+    return oldIrql;
+}
+
+void ntEnableCr0WP (KIRQL oldIrql) {
+    KeLowerIrql(oldIrql);      // восстанавливаем IRQL ядра
+    UINT64 cr0 = __readcr0();
+    __writecr0(cr0 | 0x10000); // Устанавливаем 16-бит CR0.WP
+
+    // Восстановление CR4.CTE строго после поднятия CR0.WP. В противном случае #GP
+#ifdef ENABLE_AMD64_SHADOW_STACK
+    UINT64 cr4 = __readcr4();
+    __writecr4(cr4 | 0x800000);
+#endif // ENABLE_SHADOW_STACK
+}
+
+void ntDisableCr4SMAP () {
+    UINT64 cr4 = __readcr4();
+    __writecr4(cr4 & ~0x200000);
+}
+
+void ntEnableCr4SMAP () {
+    UINT64 cr4 = __readcr4();
+    __writecr4(cr4 | 0x200000);
+}
+
 void ntMmSetPageProtection (IN void* pMem, IN size_t size, IN int newProtect) {
     if (!gMmSetPageProtection)
         gMmSetPageProtection = (decltype(gMmSetPageProtection))scanInSection(ntGetNtosBase(), ".text", SIG_MM_SET_PAGE_PROTECTION, sizeof(SIG_MM_SET_PAGE_PROTECTION));
     gMmSetPageProtection(pMem, size, newProtect);
+}
+
+NTSTATUS ntIoConnectInterruptNoACPI (PKINTERRUPT* InterruptObject, PKSERVICE_ROUTINE ServiceRoutine, PVOID ServiceContext, PKSPIN_LOCK SpinLock, ULONG Vector, KIRQL Irql, KIRQL SynchronizeIrql, KINTERRUPT_MODE InterruptMode, BOOLEAN ShareVector, KAFFINITY ProcessorEnableMask, BOOLEAN FloatingSave) {
+    if (!gIopConnectInterruptFullySpecified)
+        gIopConnectInterruptFullySpecified = (decltype(gIopConnectInterruptFullySpecified))scanInSection(ntGetNtosBase(), "PAGE", SIG_IOP_CONNECT_INTERRUPT_FULLY_SPECIFIED, sizeof(SIG_IOP_CONNECT_INTERRUPT_FULLY_SPECIFIED));
+
+    char saveStub[] = {
+        0xE8, 0xC7, 0xC9, 0xBF, 0xFF,      // call HalGetVectorInput
+        0x85, 0xC0,                        // test eax, eax
+        0x0F, 0x88, 0x84, 0x00, 0x00, 0x00 // js +0x84
+    };
+
+    uintptr_t offsetHalGetVectorInput = 0xC4;
+    hMemset((void*)((uintptr_t)gIopConnectInterruptFullySpecified + offsetHalGetVectorInput), 0x90, sizeof(saveStub));
+    NTSTATUS result = IoConnectInterrupt(InterruptObject, ServiceRoutine, ServiceContext, SpinLock, Vector, Irql, SynchronizeIrql, InterruptMode, ShareVector, ProcessorEnableMask, FloatingSave);
+    hMemcpy((void*)((uintptr_t)gIopConnectInterruptFullySpecified + offsetHalGetVectorInput), saveStub, sizeof(saveStub));
+    return result;
 }
 
 __int64 ntRtlpInsertInvertedFunctionTableEntry (IN void* pImageBase, IN PRUNTIME_FUNCTION pFunctionTable, IN int sizeImage, IN int sizeFunctionTable) {
@@ -186,6 +245,16 @@ size_t ntGetFileSize (IN HANDLE hFile) {
     IO_STATUS_BLOCK           ioStatus {0};
     cntstatus(ZwQueryInformationFile(hFile, &ioStatus, &result, sizeof(FILE_STANDARD_INFORMATION), FileStandardInformation));
     return result.EndOfFile.QuadPart;
+}
+
+void* ntGetPrcb (IN int processorsNumber) {
+    if (!gKeGetPrcb)
+        gKeGetPrcb = (decltype(gKeGetPrcb))scanInSection(ntGetNtosBase(), ".text", SIG_KE_GET_PRCB, sizeof(SIG_KE_GET_PRCB));
+    return gKeGetPrcb(processorsNumber);
+}
+
+PKPCR ntGetPrc (IN int processorsNumber) {
+    return (PKPCR)((uintptr_t)ntGetPrcb(processorsNumber) - 0x180);
 }
 
 char* ntPsGetProcessImageFileName (IN PEPROCESS pProc) {

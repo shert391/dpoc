@@ -13,6 +13,7 @@ using namespace std::filesystem;
 #include <ntifs.h>
 #include <ntddk.h>
 #include <ntimage.h>
+#include <intrin.h>
 #endif
 
 #ifdef __um__
